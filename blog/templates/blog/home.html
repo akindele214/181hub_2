@@ -1,0 +1,119 @@
+{% extends 'blog/base.html' %}
+{% load blog_tags %}
+{% block title %}Home - {{block.super}}{%endblock%}
+{% block content %}
+    {% for post in posts %}
+    {% with post|class_name as class %}
+    {% if class == 'Post' %}
+        <article class="media content-section"> 
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' post.user.username %}">{{ post.user }}{% if post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small>
+            </div>
+            <h5><a class="article-title" href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
+                {% if post.images_set.count >= 1 %}
+              <span class="badge badge-secondary ml-2" data-toggle="modal" data-target="#exampleModalCenter{{ post.pk }}"><small>IMG</small></span> 
+              {% include 'blog/modal.html'%}
+                  {% endif %}
+                  {% if post.video  %}
+              <span class="badge badge-secondary ml-2"><small>VID</small></span>
+                  {% endif %}</h5>
+              <p class="article-content">{{ post.content|truncatewords:"19"|hashtag_links|mention_link|urlize }}</p>
+          </div>
+        </article>
+      {% elif class == 'Share' %}
+      <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ post.post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' post.post.user.username %}">{{ post.post.user }}{% if post.post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+            </div>
+            <h5><a class="article-title" href="{% url 'post-detail' post.post.pk %}">{{ post.post.title }}</a>
+                {% if post.images_set.count >= 1 %}
+              <span class="badge badge-secondary ml-2" data-toggle="modal" data-target="#exampleModalCenter{{ post.title }}"><small>IMG</small></span> 
+              {% include 'blog/modal.html'%}
+                  {% endif %}
+                {% if post.video %}
+              <span class="badge badge-secondary ml-2">VID</span>
+                  {% endif %}</h5>
+              <p class="article-content">{{ post.post.content|truncatewords:"50"|hashtag_links|mention_link|urlize}}</p>
+              <p>
+                <small class="text-muted">{{ post.post.date_posted|timesince|upto:','  }} ago</small>
+              </p>
+              <div class="article-metadata"></div>
+              {% comment %} {%if post.is_quote%}
+              <article class="media content-section infinite-item mt-3">
+                <div class="media-body">
+                  <div class="article-metadata">
+                    <img src="{{ post.share_post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+                    <a class="mr-2" href="{% url 'user-posts' post.share_post.user.username %}">@{{ post.share_post.user.username }} {% if post.share_post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+                    <small class="text-muted">{{ post.share_post.date_posted|date:"F d, Y" }} </small>
+                  </div>
+                    <p class="article-content">{{ post.share_post.content|hashtag_links|mention_link }}</p>
+                </div>
+
+              </article>
+              {% endif%} {% endcomment %}
+              <article class="article-metadata-share">
+              <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              {%if post.is_quote == False%} Repost by{%endif%}
+              <a class="mr-2" href="{% url 'user-posts' post.user.username %}">{{ post.user }} {% if post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</i></a>{%if post.is_quote %}quoted a post in a thread{%endif%}
+              {% comment %} <p class="article-content">{{ post.content|hashtag_links|mention_link }}</p> {% endcomment %}
+              {% if post.image %}
+                <div class="container col-sm-12 text-center mb-2">
+                  <img src="{{post.image.url}}" alt="..." class="img-thumbnail">
+                </div>
+              {% endif %}
+              {%if post.is_quote%}
+              <article class="media content-section infinite-item mt-3">
+                <div class="media-body">
+                  <div class="article-metadata">
+                    <img src="{{ post.share_post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+                    <a class="mr-2" href="{% url 'user-posts' post.share_post.user.username %}">{{ post.share_post.user.username }} {% if post.share_post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+                    <small class="text-muted">{{ post.share_post.date_posted|date:"F d, Y" }} </small>
+                  </div>
+                    <p class="article-content">{{ post.share_post.content|hashtag_links|mention_link|urlize }}</p>
+                </div>
+
+              </article>
+              {% endif%}
+              <p class="article-content">{{ post.content|hashtag_links|mention_link|urlize }}</p>
+              <p>
+              <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small></p>
+              </article>
+              
+              <p style="text-align: center;"><a href="{% url 'share-thread' post.post.pk %}" style="text-decoration: none; color: black;">View Thread</a></p>
+          </div>
+
+      </article>
+
+      {%endif%}
+
+      {% endwith %}
+      
+      {% empty %}
+          <div class="media content-section">
+            <h4>No Posts</h4>
+          </div>
+    {% endfor %}
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-outline-info mb-4">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-info mb-4">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a href="?page={{ num }}" class="btn btn-info mb-4">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?page={{ num }}" class="btn btn-outline-info mb-4">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-info mb-4">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info mb-4">Last</a>
+      {% endif %}
+    {% endif %}
+{% endblock content %}

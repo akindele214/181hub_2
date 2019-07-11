@@ -1,0 +1,77 @@
+{% extends "blog/base.html" %}
+{% load blog_tags %}
+{% block content %}
+
+<div class='media content-section'>
+    <h4>{{ count }} results for <b>{{ query }}</b></h4>
+</div>
+        
+        
+{% for object in object_list %}
+    {% with object|class_name as klass %}
+      {% if klass == 'Profile' %}
+    <article class="media content-section">
+    <div class="media-body">
+    <div class="article-metadata">
+      <img src="{{ object.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' object.user.username %}">{{ object.user }}{% if object.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+    </div>
+    <p class="mb-3"><a href="{% url 'follower_list' object.user.username %}" style="text-decoration: none; color: #428bca;">Followers: {{object.following.count}}</a></p>
+    <p class="mb-3" ><a href="{% url 'following_list' object.user.username %}" style="text-decoration: none; color: #428bca;">Following: {{object.follower.count}}</a></p>
+    </div>
+    </article>
+           
+        
+      {% elif klass == 'Post' %}
+            <article class="media content-section">
+          <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">-->
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ object.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' object.user.username %}">{{ object.user }}{% if object.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
+            </div>
+            <h5><a class="article-title" href="{% url 'post-detail' object.pk %}">{{ object.title }}</a>
+                {% if object.image or object.image_3 or object.image_2 %}
+              <span class="badge badge-secondary ml-2">IMG</span>
+                  {% endif %}</h5>
+              <p class="article-content">{{ object.content|truncatewords:"30"|hashtag_links|mention_link|urlize }}</p>
+          </div>
+        </article>
+      {% else %}
+           <div class='row'>
+             <div class='col-12 col-lg-8 offset-lg-4'>
+                <a href='{{ object.get_absolute_url }}'>{{ object }} | {{ object|class_name }}</a>
+            </div>
+           </div>
+        {% endif %}
+        
+    {% endwith %}
+    
+{% empty %}
+<div class="media content-section">
+            <h4>No Posts Found Having Search Query "{{ request.GET.q }}"</h4>
+          </div>
+{% endfor %}
+    <!--http://127.0.0.1:8000/search/?q=lekan&page=4-->
+    <!--Pagination Begin-->
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <a href="?q={{ request.GET.q }}&page=1" class="btn btn-outline-info mb-4">First</a>
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="btn btn-outline-info mb-4">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a href="?q={{ request.GET.q }}&page={{ num }}" class="btn btn-info mb-4">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?q={{ request.GET.q }}&page={{ num }}" class="btn btn-outline-info mb-4">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="btn btn-outline-info mb-4">Next</a>
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info mb-4">Last</a>
+      {% endif %}
+    {% endif %}
+    <!--End Pagination-->
+{% endblock content %}

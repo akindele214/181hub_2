@@ -1,0 +1,48 @@
+{% load crispy_forms_tags %}
+
+{% load blog_tags %}
+<div class="container-fluid mt-2 mb-2">
+            <div class="form-group-row">
+              <form method="POST" class="comment-form" action=".">
+          {%csrf_token%}
+          {{comment_form|crispy}}
+          {% if request.user.is_authenticated %}
+          <input type="submit" name="Submit" class="btn btn-outline-info">
+          {%else%}
+          <input type="submit" value="You need to sign in to reply" class="btn btn-outline-info" disabled>
+          {%endif%}
+        </form>
+            </div>
+          </div> 
+          <a class="ml-3 mb-2">{{ comments.count }} Comment{{comments|pluralize}}</a>
+          {% for comment in comments %}
+            <blockquote class="blockquote text-left ml-3 mb-3 mt-4">
+            <p class="mb-0"><small>{{comment.content|mention_link|hashtag_links}}</small></p>
+            <footer class="blockquote-footer"><small> by <cite title="User"><a href="{% url 'user-posts' comment.user %}">{{comment.user}}</a></cite></small> 
+              <button type="button" class="reply-btn btn btn-outline-dark btn-sm ml-2">Reply</button>
+            </footer>
+            </blockquote>
+
+            <div class="replied-comments container mt-2" style="display: none;">
+              {% for reply in comment.replies.all %}
+              <blockquote class="blockquote text-left">
+              <p class="mb-0"><small>{{reply.content|mention_link|hashtag_links}}</small></p>
+              <footer class="blockquote-footer"><small> by <cite title="User"><a href="{% url 'user-posts' reply.user%}">{{reply.user}}</a></cite></small>
+
+              </footer>
+              </blockquote>
+              {%endfor%}
+              <div class="form-group-row">
+              <form method="POST" class="reply-form" action=".">
+                {%csrf_token%}
+                <input type="hidden" name="comment_id" value="{{comment.id}}">
+                {{comment_form|crispy}}
+                {% if request.user.is_authenticated %}
+                <input type="submit" name="Submit" class="btn btn-outline-info">
+                {%else%}
+                <input type="submit" value="You need to sign in to reply" class="btn btn-outline-info" disabled>
+                {%endif%}
+              </form>
+              </div>
+            </div>
+          {% endfor %}

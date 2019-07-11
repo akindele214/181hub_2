@@ -1,0 +1,39 @@
+{% extends 'blog/base.html' %}
+{% load blog_tags %}
+{% block content %}
+<ul class="notifications">
+  {% for notice in notifications %}
+    {% include 'notifications/notice.html' %}
+  {% endfor %}
+</ul>
+{% for notice in notify %}
+<article class="media content-section">
+          {% comment %} <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">--> {% endcomment %}
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{notice.actor.profile.image.url}}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' notice.actor.username %}">{{ notice.actor }}</a> {{notice.verb }}
+            </div>
+            {% if notice.action_object != None %}
+              <h5><a class="article-title" href="{% url 'post-detail' notice.action_object.id %}">{{ notice.action_object.title }}</a>
+                {% if notice.action_object.image or notice.action_object.image_3 or notice.action_object.image_2 %}
+              <span class="badge badge-secondary ml-2">IMG</span>
+                  {% endif %}</h5>
+            {% endif %}
+          
+            {% if notice.description != None %}
+              <p class="article-content" style="white-space: normal;">
+              {{notice.description|hashtag_links|mention_link}}
+              </p>
+            {% endif %}
+
+           <p>
+            <small class="text-muted" style="float: right;">{{ notice.timesince|upto:','  }} ago</small>
+          </p>
+          
+          </div>
+         
+        </article>
+{% endfor %}
+
+{% endblock content %}

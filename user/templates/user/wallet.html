@@ -1,0 +1,52 @@
+{% extends 'blog/base.html' %}
+{% block title %}Wallet - {{block.super}}{%endblock%}
+{% block content %}
+    <div class="content-section">
+  <div class="media">
+    <img class="rounded-circle account-img mr-4" src="{{ user.profile.image.url }}"> 
+    <div class="media-body">
+      <h4 class="account-heading">{{ user.username }} {% if user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</h4>
+      <p class="text-secondary">{{ user.email }}</p>
+    </div>
+  </div>
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">
+                    Views Info
+                </legend>
+
+                <p><a class="mr-2" href="{% url 'user-posts' user.username %}" style="text-decoration: none;">Total Post{{post_count|pluralize}}: {{post_count}}</a></p>
+                <p>Total View{{total_views|pluralize}}: {{total_views}}</p>
+                <p>Monetized Views: {{monetized_views}}</p> 
+                <p>Money Lowo Lowo: ₦{{money}}</p> 
+                {% if is_cash %}
+                <form method="GET" action="{% url 'monetize' %}">
+                <button class="btn btn-outline-info">Cash Out</button>
+                </form>
+                {% else %}
+                <button class="btn btn-outline-info"><small>Money Lowo Lowo Has To Be Above 1000 To Cash Out</small></button>
+                {%endif%}
+            </fieldset>
+            
+</div>
+{% for order in orders %}
+<article class="content-section">
+          <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">-->
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ order.user.profile.image.url }}" class="rounded-circle article-img">
+              <a class="mr-2" href="{% url 'user-posts' order.user.username %}">@{{ order.user }}</a>
+              <small class="text-muted">{{ order.time_stamp|date:"F d, Y" }}</small>
+            </div>
+            <h5>Views: {{ order.views }}
+            {% if order.status == 'uncleared' %}
+              <span class="badge badge-secondary ml-2">UNCLEARED</span>
+            {% else %}
+              <span class="badge badge-success ml-2">CLEARED</span>
+            {% endif %}</h5>
+            <p class="article-content mb-1">Amount: ₦{{ order.amount }}</p>
+            <p class="article-content mb-1">Bank Details {{order.get_bank_display}}-{{order.account_num}} </p>
+            <p class="article-content mb-1">Ref No: {{order.transaction_ref}} </p>
+          </div>
+        </article>
+        {%endfor%}
+{% endblock content %}

@@ -1,0 +1,31 @@
+{% extends 'blog/base.html' %}
+{% load crispy_forms_tags %}
+{% block title %}Quote Post - {{block.super}}{%endblock%}
+{% block content %}
+    <div class="content-section">
+    	<legend class="border-bottom mb-4">
+                   Quote Post
+                </legend>
+        <!-- Post -->
+        <article class="media content-section infinite-item">
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ share_post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' share_post.user.username %}">@{{ share_post.user }}</a>
+              <small class="text-muted">{{ share_post.date_posted|date:"F d, Y" }} </small>
+            </div>
+              <p class="article-content">{{ share_post.content|truncatewords:"25"|urlize  }}</p>
+          </div>
+        </article>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Quote</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

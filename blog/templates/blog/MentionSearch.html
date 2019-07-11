@@ -1,0 +1,79 @@
+{% extends 'blog/base.html' %}
+{% load blog_tags %} 
+{% block content %}
+
+{% if is_exist == 0 %}
+<div class="media content-section">
+	<h3>User Does Not Exist</h3>
+</div>
+{%else%}
+    <article class="media content-section"> 
+    <div class="media-body">
+    <div class="article-metadata">
+    <img src="{{ user.profile.image.url }}" class="rounded-circle article-img mb-2">
+    <a class="mr-1" style="font-size: 20px; font-weight: lighter;"><b>Posts by {{ user }} ({{ posts.count }})</b></a>
+    </div>
+    {% if len >= 6 %}
+    <p class="mb-3">Bio: {{ user.profile.content }}</p>
+    {% endif %}
+    <p class="mb-3"><a href="{% url 'follower_list' user.username %}" style="text-decoration: none; color: #428bca;">Followers: {{total_follower}}</a></p>
+
+    <p class="mb-3" ><a href="{% url 'following_list' user.username %}" style="text-decoration: none; color: #428bca;">Following: {{total_following}}</a></p>
+
+    {% if request.user.is_authenticated %}
+    {% if is_user == False%}
+    <p class="mb-3" ><a href="{% url 'message' user.id %}" style="text-decoration: none; color: #428bca;">Message</a></p>
+    <form method="POST" action="{% url 'follower' user.id %}">
+      {%csrf_token%}
+    {% if is_following %}
+    <button type="submit" name="user_id" value="{{user.id}}" class="btn btn-danger" id="follow">Unfollow</button>
+    {% else %}
+    <button type="submit" name="user_id" value="{{user.id}}" class="btn btn-primary" id="follow">Follow</button>
+    {% endif %}
+    </form>
+    {%endif%}
+    {%endif%}
+    </div>
+    </article>
+    {% for post in post %}
+        <article class="media content-section">
+          <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">-->
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img">
+              <a class="mr-2" href="{% url 'user-posts' post.user.username %}">{{ post.user }}</a>
+              <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small>
+            </div>
+            <h5><a class="article-title" href="{% url 'post-detail' post.pk%}">{{ post.title }}</a>
+            {% if post.images_set.count >= 1 %}
+              <span class="badge badge-secondary ml-2">IMG</span>
+                  {% endif %}</h5>
+            <p class="article-content">{{ post.content|truncatewords:"19"|hashtag_links|mention_link }}</p>
+          </div>
+        </article>
+    {% endfor %} 
+
+    {% if post.has_other_pages %}
+      {% if post.has_previous %}
+        <a href="?page=1" class="btn btn-outline-info mb-4">First</a>
+        <a href="?page={{ post.previous_page_number }}" class="btn btn-outline-info mb-4">Previous</a>
+      {% endif %}
+
+      {% for num in post.paginator.page_range %}
+        {% if post.number == num %}
+          <a href="?page={{ num }}" class="btn btn-info mb-4">{{ num }}</a>
+        {% elif num > post.number|add:'-3' and num < post.number|add:'3' %}
+          <a href="?page={{ num }}" class="btn btn-outline-info mb-4">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if post.has_next %}
+        <a href="?page={{ post.next_page_number }}" class="btn btn-outline-info mb-4">Next</a>
+        <a href="?page={{ post.paginator.num_pages }}" class="btn btn-outline-info mb-4">Last</a>
+      {% endif %}
+    {% endif %}
+
+
+{%endif%}
+
+
+{% endblock content%}

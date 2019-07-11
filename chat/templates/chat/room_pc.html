@@ -1,0 +1,202 @@
+{% load static %}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<!------ Include the above in your HEAD tag ----------
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+!------ Include the above in your HEAD tag ---------->
+
+
+<!DOCTYPE html><html >
+<head>
+
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'blog/favicon/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'blog/favicon/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'blog/favicon/favicon-16x16.png' %}">
+  <link rel="manifest" href="{% static 'blog/favicon/site.webmanifest' %}">
+  <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+
+  <script src="https://use.typekit.net/hoy3lrg.js"></script>
+  <script>try{Typekit.load({ async: true });}catch(e){}</script>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+  <link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'><link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.2/css/font-awesome.min.css'>
+  <link rel="stylesheet" href="{% static 'chat/style_pc.css' %}" />
+  <title>{{ participants.username|title }} - Messenger</title>
+</head>
+<body>
+<div id="frame">
+	<div class="content">
+		<div class="contact-profile">
+			<img src="{{participants.profile.image.url}}" alt="" />
+			<p>{{ participants.username|title }}</p>
+			<div class="social-media">
+
+      
+        <a href="/" style="text-decoration: none; color:#4b719a; margin-top: 2%"><i class="fas fa-home fa-2x"></i></a>
+				{% comment %} <a href="{% url 'notifications:mark_all_as_read' %}" style><i class="fas fa-bell fa-3x"> ({% live_notify_badge %})</i></a> {% endcomment %}
+      </div>
+		</div>
+		<div class="messages">
+			<ul id="chat-log">
+
+			</ul>
+		</div>
+      <div class="message-input">
+        <div class="wrap">
+        <input id="chat-message-input" type="text" autocomplete="off" required placeholder="Write your message..." />
+        <button id="chat-message-submit" class="submit">
+          <i class="fa fa-paper-plane" aria-hidden="true"></i>
+        </button>
+        </div>
+      </div>
+    </div>
+  </div>
+<script src="{% static 'chat/main.js' %}"></script>
+<script src="{% static 'chat/reconnecting-websocket.js' %}"></script>
+<script>
+    var roomName = {{ room_name_json }};
+    var username = {{ username }};
+
+    var chatSocket = new ReconnectingWebSocket(
+        'ws://' + window.location.host +
+        '/ws/chat/' + roomName + '/');
+
+    chatSocket.onopen = function(e) {
+      fetchMessages();
+    }
+
+    chatSocket.onmessage = function(e) {
+        var data = JSON.parse(e.data);
+        if (data['command'] === 'messages') {
+          for (let i=0; i<data['messages'].length; i++) {
+            createMessage(data['messages'][i]);
+          }
+        } else if (data['command'] === 'new_message'){
+          createMessage(data['message']);
+        }
+    };
+
+  const timeConverter = timestamp => {
+      const time = new Date(timestamp) 
+      month = ''
+      if (time.getMonth()===1){
+          month = 'Jan'
+      }
+      else if (time.getMonth()===2){
+        month = 'Feb'
+      }
+      else if (time.getMonth()===3){
+        month = 'Mar'
+      }
+      else if (time.getMonth()===4){
+        month = 'April'
+      }
+      else if (time.getMonth()===5){
+        month = 'May'
+      }
+      else if (time.getMonth()===6){
+        month = 'June'
+      }
+      else if (time.getMonth()===7){
+        month = 'July'
+      }
+      else if (time.getMonth()===8){
+        month = 'Aug'
+      }
+      else if (time.getMonth()===9){
+        month = 'Sept'
+      }
+      else if (time.getMonth()===10){
+        month = 'Oct'
+      }
+      else if (time.getMonth()===11){
+        month = 'Nov'
+      }
+      else if (time.getMonth()===12){
+        month = 'Dec'
+      }
+      else {
+
+      }
+      final_time = time.getHours()+':'+time.getMinutes() +' '+month+' '+ time.getDay()+', '+  time.getFullYear()
+      console.log(final_time)
+      return final_time
+    }
+
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        var messageInputDom = document.getElementById('chat-message-input');
+        var message = messageInputDom.value;
+
+        if (message.length !== 0) {
+        console.log('empty');
+        chatSocket.send(JSON.stringify({
+            'command': 'new_message',
+            'message': message,
+            'from': username,
+            'chatId': roomName,
+        }));
+
+        messageInputDom.value = '';
+        }
+        else{
+
+        }
+
+        // chatSocket.send(JSON.stringify({
+        //     'command': 'new_message',
+        //     'message': message,
+        //     'from': username,
+        //     'chatId': roomName,
+        // }));
+
+        // messageInputDom.value = ''; 
+    };
+
+    function fetchMessages() {
+      chatSocket.send(JSON.stringify({'command': 'fetch_messages', 'chatId': roomName, 'current_user':username }));
+    }
+    var docHeight = $(document).height();
+
+
+    function createMessage(data) {
+      var author = data['author'];
+      var msgListTag = document.createElement('li');
+      var pTag = document.createElement('p');
+      var br = document.createElement('br')
+      var date = document.createElement('SMALL')
+      pTag.textContent = data.content;
+      var date_time = document.createTextNode(timeConverter(data.timestamp));
+      pTag.appendChild(br)
+      date.appendChild(date_time)
+      pTag.appendChild(date)
+
+      if (author === username) {
+        msgListTag.className = 'replies';
+
+      } else {
+        msgListTag.className = 'sent';
+
+      }
+       msgListTag.appendChild(pTag);
+      document.querySelector('#chat-log').appendChild(msgListTag);
+      //window.scrollTo(0,document.querySelector("#chat-log").scrollHeight);
+      $(".messages").animate({scrollTop: docHeight + 93}, 0);
+      docHeight += 93;
+    }
+
+</script>
+</body></html>

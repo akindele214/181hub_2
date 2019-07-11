@@ -1,0 +1,92 @@
+{% extends "blog/base.html" %}
+{% block title %}#{{query}} - {{block.super}}{%endblock%}
+{% load blog_tags %}
+{% block content %}
+
+<div class='media content-section'>
+    <h4>{{ count }} result{{count|pluralize}} for <b>#{{ query }}</b></h4>
+</div>
+        
+  {% for post in posts %}
+    {% with post|class_name as class %}
+    {% if class == 'HashTag' %}
+        <article class="media content-section"> 
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ post.post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' post.post.user.username %}">{{ post.post.user }}  {% if post.post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <small class="text-muted">{{ post.post.date_posted|timesince|upto:','  }} ago</small>
+            </div>
+            <h5><a class="article-title" href="{% url 'post-detail' post.post.pk %}">{{ post.post.title }}</a>
+                {% if post.post.images_set.count >= 1 %}
+              <span class="badge badge-secondary ml-2" data-toggle="modal" data-target="#exampleModalCenter{{ post.title }}"><small>IMG</small></span> 
+              {% include 'blog/modal.html'%}
+                  {% endif %}
+                  {% if post.post.video  %}
+              <span class="badge badge-secondary ml-2">VID</span>
+              <button type="button" class="btn btn-secondary btn-sm">VID</button>
+                  {% endif %}</h5>
+              <p class="article-content">{{ post.post.content|truncatewords:"19"|hashtag_links|mention_link|urlize}}</p>
+          </div>
+        </article>
+      {% elif class == 'ShareTag' %}
+      <article class="media content-section">
+        <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ post.share.post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts'  post.share.post.user.username %}">{{post.share.post.user }}  {% if post.share.post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+            </div>
+            <h5><a class="article-title" href="{% url 'post-detail' post.share.post.pk %}">{{ post.share.post.title }}</a>
+                {% if post.share.post.images_set.count >= 1 %}
+              <span class="badge badge-secondary ml-2" data-toggle="modal" data-target="#exampleModalCenter{{ post.title }}"><small>IMG</small></span> 
+              {% include 'blog/modal.html'%}
+                  {% endif %}
+                {% if post.share.post.video %}
+              <span class="badge badge-secondary ml-2">VID</span>
+                  {% endif %}</h5>
+              <p class="article-content">{{ post.share.post.content|truncatewords:"19"|hashtag_links|mention_link|urlize }}</p>
+              <p>
+                <small class="text-muted">{{ post.share.post.date_posted|timesince|upto:','  }} ago</small>
+              </p>
+              <div class="article-metadata"></div>
+              
+              <article class="article-metadata-share">
+              <img src="{{ post.share.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              Repost by
+              <a class="mr-2" href="{% url 'user-posts' post.share.user.username %}"> {{ post.share.user }}  {% if post.share.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <p class="article-content">{{ post.share.content|hashtag_links|mention_link|urlize }}</p>
+              <p>
+              <small class="text-muted">{{ post.share.date_posted|timesince|upto:','  }} ago</small></p>
+              </article>
+              <p style="text-align: center;"><a href="{% url 'share-thread' post.share.post.pk %}" style="text-decoration: none; color: black;">View Thread</a></p>
+          </div>
+
+      </article>
+
+      {%endif%}
+
+      {% endwith %}
+
+      {% endfor %}
+    {% comment %} <!--http://127.0.0.1:8000/search/?q=lekan&page=4--> {% endcomment %}
+    <!--Pagination Begin-->
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <a href="?q={{ request.GET.q }}&page=1" class="btn btn-outline-info mb-4">First</a>
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="btn btn-outline-info mb-4">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a href="?q={{ request.GET.q }}&page={{ num }}" class="btn btn-info mb-4">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?q={{ request.GET.q }}&page={{ num }}" class="btn btn-outline-info mb-4">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="btn btn-outline-info mb-4">Next</a>
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info mb-4">Last</a>
+      {% endif %}
+    {% endif %}
+    <!--End Pagination-->
+{% endblock content %}

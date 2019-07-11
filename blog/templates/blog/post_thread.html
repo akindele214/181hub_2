@@ -1,0 +1,112 @@
+{% extends 'blog/base.html' %}
+{% load blog_tags %}
+{% load crispy_forms_tags %}
+{% block title %}{{ori_post.title}} Thread- {{block.super}}{%endblock%}
+{% block content %}
+        <article class="media content-section mb-0">
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ ori_post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' ori_post.user.username %}">{{ ori_post.user }} {% if ori_post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <small class="text-muted"><a href="{% url 'share_post' pk=ori_post.id %}" data-toggle="tooltip" title="Share Post">
+              <i class="fas fa-exchange-alt ml-2 fa-lg"></i>
+              </a></small>
+            </div>
+            <h5><a class="article-title" href="{% url 'post-detail' ori_post.pk %}">{{ ori_post.title }}</a>
+                {% if ori_post.image.count > 1 %}
+              <span class="badge badge-secondary ml-2">IMG</span>
+                  {% endif %}</h5>
+              <p class="article-content">{{ ori_post.content|truncatewords:"70"|hashtag_links  }}</p>
+              <small class="text-muted" style="float: right;">{{ ori_post.date_posted|timesince|upto:','  }} ago </small>
+          </div>
+        </article>
+          {% for post in shares %}
+          
+          <svg height="40" width="60" style="margin-top: 0px;margin-bottom: -5px;">
+          <line x1="30" y1="0" x2="30" y2="100" style="stroke:rgb(189, 189, 189);stroke-width:1.3" />
+          <circle   fill="white" style="stroke:rgb(189, 189, 189);stroke-width: 1.3;" r="4" cx="30" cy="20" opacity="1.0"/>
+          </svg>
+
+          <article class="media content-section-share mb-0 mt-0" id="{{post.id}}">
+          <div class="media-body">
+              <div class="article-metadata-share">
+              <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' post.user.username %}"> {{ post.user }} {% if post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a> 
+                {% if post.user == user %}
+                <small class="text-muted"> 
+                <a href="{% url 'share-edit' post.id %}" class="btn btn-outline-secondary btn-sm mt-1 mb-1">Edit</a></small>  
+              <small class="text-muted"> 
+                <a href="{% url 'share-delete' post.id %}" class="btn btn-outline-danger btn-sm mt-1 mb-1">Delete</a></small>   
+              {% endif %}  
+            </div>
+              {%if post.is_quote%}
+              <article class="media content-section infinite-item mt-3">
+                <div class="media-body">
+                  <div class="article-metadata">
+                    <img src="{{ post.share_post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+                    <a class="mr-2" href="{% url 'user-posts' post.share_post.user.username %}">{{ post.share_post.user.username }} {% if post.share_post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+                    <small class="text-muted">{{ post.share_post.date_posted|date:"F d, Y" }} </small>
+                  </div>
+                    <p class="article-content">{{ post.share_post.content|hashtag_links|mention_link|urlize }}</p>
+                </div>
+
+              </article>
+              {% endif%}
+              <p class="article-content">{{ post.content|hashtag_links|mention_link|urlize }}</p>
+              {% if post.image %}
+                <div class="container col-sm-12 text-center">
+                  <img src="{{post.image.url}}" alt="..." class="img-thumbnail">
+                </div>
+              {% endif %}
+
+              <p class="mt-3">
+              <small class="text-muted" style="float: left;">
+                <a href="{% url 'quote-share' post.id %}" class="text-muted">Quote</a>
+                <a href="{% url 'report-share' post.id %}" class="text-muted ml-2">Report</a>
+                  
+              </small>
+              <small class="text-muted" style="float: right;">{{ post.date_posted|timesince|upto:','  }} ago</small>
+              </p>
+
+            </div></article>
+          {% empty %}
+          <svg height="40" width="40">
+          <line x1="30" y1="0" x2="30" y2="100" style="stroke:rgb(189, 189, 189);stroke-width:1.3" />
+          <circle   fill="white" style="stroke:rgb(189, 189, 189);stroke-width: 1.3;" r="4" cx="30" cy="20" opacity="1.0"/>
+          </svg>
+          <div class="media content-section">
+            <h4>No Repost For This Post</h4>
+          </div>
+    {% endfor %}
+    <div class="mb-4"></div>
+    {% comment %} 
+    <!--<div class="loading" style="display: none;">
+    Loading...
+    </div>
+    
+    {% if is_paginated %}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="infinite-more-link">More</a>
+    {% endif %}
+    {% endif %}--> 
+    {% endcomment %}
+     
+    {% if is_paginated %}
+      {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn btn-outline-info mb-4">First</a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn btn-outline-info mb-4">Previous</a>
+      {% endif %}
+
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <a href="?page={{ num }}" class="btn btn-info mb-4">{{ num }}</a>
+        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+          <a href="?page={{ num }}" class="btn btn-outline-info mb-4">{{ num }}</a>
+        {% endif %}
+      {% endfor %}
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="btn btn-outline-info mb-4">Next</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="btn btn-outline-info mb-4">Last</a>
+      {% endif %}
+    {% endif %}
+{% endblock content %}

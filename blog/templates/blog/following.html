@@ -1,0 +1,16 @@
+{%extends 'blog/base.html'%}
+{% block content %}
+	{% for follower in follower_list %}
+    <article class="media content-section">
+          <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">-->
+    <div class="media-body">
+    <img src="{{ follower.image.url }}" class="rounded-circle article-img">
+    <a class="mr-2" href="{% url 'user-posts' follower.user.username %}">{{ follower.user.username }}</a>
+          </div>
+        </article>
+        {% empty %}
+          <div class="media content-section">
+            <h4>{{username}} is following no one</h4>
+          </div>
+    {% endfor %}
+{% endblock content%}

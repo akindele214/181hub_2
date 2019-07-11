@@ -1,0 +1,498 @@
+{%load static%}
+<link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<!------ Include the above in your HEAD tag ---------->
+
+
+<!DOCTYPE html><html class=''>
+<head>
+	<link rel="apple-touch-icon" sizes="180x180" href="{% static 'blog/favicon/apple-touch-icon.png' %}">
+	<link rel="icon" type="image/png" sizes="32x32" href="{% static 'blog/favicon/favicon-32x32.png' %}">
+	<link rel="icon" type="image/png" sizes="16x16" href="{% static 'blog/favicon/favicon-16x16.png' %}">
+    <link rel="manifest" href="{% static 'blog/favicon/site.webmanifest' %}">
+
+	<link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,600,700,300' rel='stylesheet' type='text/css'>
+	<link rel="stylesheet" href="{% static 'chat/messager_pc.css' %}" /> 
+	<link rel='stylesheet prefetch' href='https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css'>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+	{%if request_page%}
+	<title>Message Requests</title>
+	{%else%}
+	<title>Messages</title>
+	{%endif%}
+</head>
+<body>
+{% comment %} <div id="frame">
+	<div id="sidepanel">
+		<div id="profile">
+			<div class="wrap">
+					<p>
+				 	<a href="/" style="color: #fff; text-decoration: none;">
+					<i class="fas fa-arrow-left" style="margin-right: 2%;"></i>
+					</a>
+				 	Chats
+					
+					{% if not request_page%}
+					<a href="{%url 'unaccepted_messages'%}" style="color: #fff; text-decoration: none; float: right; margin-right: 2%;">
+					Message Request{{chat_request.count|pluralize}}
+					({{chat_request.count}})
+					</a>
+					{%endif%}				 
+				 	</p>
+			</div>
+		</div> {% endcomment %}
+		{% comment %} <!-- <div id="search">
+			<label for=""><i class="fa fa-search fa-3x" aria-hidden="true"></i></label>
+			<input type="text" placeholder="Search Chat..." />
+		</div> --> {% endcomment %}
+		{% comment %} <div id="contacts">
+			<ul>
+                {%for chat in chat %}
+
+                    
+                {%for participant in chat.participants.all %}
+                {% if participant != request.user%}
+                <a href="{% url 'message' participant.id %}" style="text-decoration: none; color: white;">
+                {%endif%}
+                {%endfor%}
+                        <li class="contact">
+                        <div class="wrap">
+                            {%for participant in chat.participants.all %}
+                            {% if participant != request.user%}
+                            <img src="{{participant.profile.image.url}}" alt="" 
+                            {% for message in chat.messages.all %} 
+                               {%if message.author != request.user %}
+                                {% if message.read != True%}
+                                    class="online"
+                                {%endif%}
+                               {%endif%}
+                            {% endfor %}
+                            />
+                            {%endif%}
+                            {%endfor%}
+                            <div class="meta">
+                            {%for participant in chat.participants.all %}
+                                {% if participant != request.user%}
+                                <p class="name">{{ participant }}</p>
+                                {%endif%}
+                            {%endfor%}
+                                <p class="preview">{{ chat.messages.last.content }}</p>
+                            </div>
+                                <span class="badge badge-light badge" 
+                                  style="margin-top: 27px; font-size: 2.5em; float:right; border-radius: 1.0rem;">
+                                 {{ chat.messages.read }}</span> 
+
+                                 
+                        </div>
+                        </li>
+                    </a>
+                {%endfor%}  {% endcomment %}
+				 
+                {% comment %} <li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+						<div class="meta">
+							<p class="name">Louis Litt</p>
+							<p class="preview">You just got LITT up, Mike.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+						<div class="meta">
+							<p class="name">Harvey Specter</p>
+							<p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/rachelzane.png" alt="" />
+						<div class="meta">
+							<p class="name">Rachel Zane</p>
+							<p class="preview">I was thinking that we could have chicken tonight, sounds good?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/donnapaulsen.png" alt="" />
+						<div class="meta">
+							<p class="name">Donna Paulsen</p>
+							<p class="preview">Mike, I know everything! I'm Donna..</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/haroldgunderson.png" alt="" />
+						<div class="meta">
+							<p class="name">Harold Gunderson</p>
+							<p class="preview">Thanks Mike! :)</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/danielhardman.png" alt="" />
+						<div class="meta">
+							<p class="name">Daniel Hardman</p>
+							<p class="preview">We'll meet again, Mike. Tell Jessica I said 'Hi'.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/katrinabennett.png" alt="" />
+						<div class="meta">
+							<p class="name">Katrina Bennett</p>
+							<p class="preview">I've sent you the files for the Garrett trial.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/charlesforstman.png" alt="" />
+						<div class="meta">
+							<p class="name">Charles Forstman</p>
+							<p class="preview">Mike, this isn't over.</p>
+						</div>
+					</div>
+                </li>
+                
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/haroldgunderson.png" alt="" />
+						<div class="meta">
+							<p class="name">Harold Gunderson</p>
+							<p class="preview">Thanks Mike! :)</p>
+						</div>
+					</div>
+				</li> 
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+						<div class="meta">
+							<p class="name">Louis Litt</p>
+							<p class="preview">You just got LITT up, Mike.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+						<div class="meta">
+							<p class="name">Harvey Specter</p>
+							<p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/rachelzane.png" alt="" />
+						<div class="meta">
+							<p class="name">Rachel Zane</p>
+							<p class="preview">I was thinking that we could have chicken tonight, sounds good?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/donnapaulsen.png" alt="" />
+						<div class="meta">
+							<p class="name">Donna Paulsen</p>
+							<p class="preview">Mike, I know everything! I'm Donna..</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/haroldgunderson.png" alt="" />
+						<div class="meta">
+							<p class="name">Harold Gunderson</p>
+							<p class="preview">Thanks Mike! :)</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/danielhardman.png" alt="" />
+						<div class="meta">
+							<p class="name">Daniel Hardman</p>
+							<p class="preview">We'll meet again, Mike. Tell Jessica I said 'Hi'.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/katrinabennett.png" alt="" />
+						<div class="meta">
+							<p class="name">Katrina Bennett</p>
+							<p class="preview">I've sent you the files for the Garrett trial.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/charlesforstman.png" alt="" />
+						<div class="meta">
+							<p class="name">Charles Forstman</p>
+							<p class="preview">Mike, this isn't over.</p>
+						</div>
+					</div>
+                </li>
+                
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/haroldgunderson.png" alt="" />
+						<div class="meta">
+							<p class="name">Harold Gunderson</p>
+							<p class="preview">Thanks Mike! :)</p>
+						</div>
+					</div>
+				</li> 
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+						<div class="meta">
+							<p class="name">Louis Litt</p>
+							<p class="preview">You just got LITT up, Mike.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+						<div class="meta">
+							<p class="name">Harvey Specter</p>
+							<p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/rachelzane.png" alt="" />
+						<div class="meta">
+							<p class="name">Rachel Zane</p>
+							<p class="preview">I was thinking that we could have chicken tonight, sounds good?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/donnapaulsen.png" alt="" />
+						<div class="meta">
+							<p class="name">Donna Paulsen</p>
+							<p class="preview">Mike, I know everything! I'm Donna..</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/haroldgunderson.png" alt="" />
+						<div class="meta">
+							<p class="name">Harold Gunderson</p>
+							<p class="preview">Thanks Mike! :)</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/danielhardman.png" alt="" />
+						<div class="meta">
+							<p class="name">Daniel Hardman</p>
+							<p class="preview">We'll meet again, Mike. Tell Jessica I said 'Hi'.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/katrinabennett.png" alt="" />
+						<div class="meta">
+							<p class="name">Katrina Bennett</p>
+							<p class="preview">I've sent you the files for the Garrett trial.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/charlesforstman.png" alt="" />
+						<div class="meta">
+							<p class="name">Charles Forstman</p>
+							<p class="preview">Mike, this isn't over.</p>
+						</div>
+					</div>
+                </li>
+                
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/haroldgunderson.png" alt="" />
+						<div class="meta">
+							<p class="name">Harold Gunderson</p>
+							<p class="preview">Thanks Mike! :)</p>
+						</div>
+					</div>
+				</li> 
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/louislitt.png" alt="" />
+						<div class="meta">
+							<p class="name">Louis Litt</p>
+							<p class="preview">You just got LITT up, Mike.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/harveyspecter.png" alt="" />
+						<div class="meta">
+							<p class="name">Harvey Specter</p>
+							<p class="preview">Wrong. You take the gun, or you pull out a bigger one. Or, you call their bluff. Or, you do any one of a hundred and forty six other things.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/rachelzane.png" alt="" />
+						<div class="meta">
+							<p class="name">Rachel Zane</p>
+							<p class="preview">I was thinking that we could have chicken tonight, sounds good?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/donnapaulsen.png" alt="" />
+						<div class="meta">
+							<p class="name">Donna Paulsen</p>
+							<p class="preview">Mike, I know everything! I'm Donna..</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/haroldgunderson.png" alt="" />
+						<div class="meta">
+							<p class="name">Harold Gunderson</p>
+							<p class="preview">Thanks Mike! :)</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/danielhardman.png" alt="" />
+						<div class="meta">
+							<p class="name">Daniel Hardman</p>
+							<p class="preview">We'll meet again, Mike. Tell Jessica I said 'Hi'.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/katrinabennett.png" alt="" />
+						<div class="meta">
+							<p class="name">Katrina Bennett</p>
+							<p class="preview">I've sent you the files for the Garrett trial.</p>
+						</div>
+					</div>
+				</li>
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/charlesforstman.png" alt="" />
+						<div class="meta">
+							<p class="name">Charles Forstman</p>
+							<p class="preview">Mike, this isn't over.</p>
+						</div>
+					</div>
+                </li>
+                
+				<li class="contact">
+					<div class="wrap">
+						<img src="http://emilcarlsson.se/assets/jessicapearson.png" alt="" />
+						<div class="meta">
+							<p class="name">Jessica Pearson</p>
+							<p class="preview">Have you finished the draft on the Hinsenburg deal?</p>
+						</div>
+					</div>
+				</li>   {% endcomment %}
+			</ul>
+		</div>
+	</div>
+</div>
+<script>
+	alert("This feature is not available on PC")
+</script>
+</body></html>
