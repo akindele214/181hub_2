@@ -82,8 +82,7 @@ pyOpenSSL==19.0.0
 python-dateutil==2.8.0
 python-social-auth==0.3.6
 python3-openid==3.1.0
-pytz==2018.7
-pywin32==224
+pytz==2018.7 
 PyYAML==5.1.1
 queuelib==1.5.0
 redis==2.10.6
@@ -94,9 +93,7 @@ service-identity==18.1.0
 six==1.11.0
 social-auth-app-django==3.1.0
 social-auth-core==3.1.0
-sqlparse==0.3.0
-tensorboard==1.8.0
-tensorflow==1.8.0
+sqlparse==0.3.0 
 termcolor==1.1.0
 text-unidecode==1.2
 Twisted==19.2.1

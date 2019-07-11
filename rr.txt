@@ -1,0 +1,1 @@
+https://files.pythonhosted.org/packages/41/02/3d5014e3b70c950492ceb65785ef724d073785f02fd51401430fd5fef681/pywin32-224-cp36-cp36m-win32.whl
