@@ -13,8 +13,7 @@ SECRET_KEY = 'k++ljsenmj!r3wj$_j^ry7fmkr=-lullj$b756%%h9ck1=)3o5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['134.209.169.2040', 'localhost', '181hub.com', 'www.181hub.com']
 
 # Application definition
 
@@ -95,10 +94,20 @@ CHANNEL_LAYERS = {
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'hub',
+        'USER': 'lekan',
+        'PASSWORD': 'eljefe/97',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -142,10 +151,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIR = (
-    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'staticfiles'),
 )
 
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
