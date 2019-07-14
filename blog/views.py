@@ -321,13 +321,13 @@ class PostDetailView(PostMixinDetailView, HitCountDetailView):
         is_saved = False
         is_thread = False
 
-        if Share.objects.filter(post__iexact=pk).exists():
+        if Share.objects.filter(post__exact=pk).exists():
             is_thread = True
 
-        if post.likes.filter(id__iexact=UserId).exists():
+        if post.likes.filter(id__exact=UserId).exists():
             is_liked = True
 
-        if post.saved.filter(id__iexact=UserId).exists():
+        if post.saved.filter(id__exact=UserId).exists():
             is_saved = True
 
         if request.method == 'POST':
@@ -438,7 +438,7 @@ class SavedPostListView(LoginRequiredMixin,ListView):
     def get_queryset(self):
         users = self.request.user 
         # users = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(saved__iexact=users).order_by('-date_posted')
+        return Post.objects.filter(saved__exact=users).order_by('-date_posted')
 
 
 @login_required
