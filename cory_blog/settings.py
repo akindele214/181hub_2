@@ -101,13 +101,16 @@ CHANNEL_LAYERS = {
 #     }
 # }
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'hub',
-        'USER': 'lekan',
-        'PASSWORD': 'eljefe/97',
-        'HOST': 'localhost',
-        'PORT': '',
+   'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'OPTIONS': {
+        'read_default_file': '/etc/mysql/my.cnf',
+        },
+        #'NAME': 'hub_2',
+        #'USER': 'admin',
+        #'PASSWORD': 'eljefe/97',
+        #'HOST': 'localhost',
+        #'PORT': '',
     }
 }
 
@@ -181,11 +184,11 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 EMAIL_HOST = 'smtp.gmail.com'
 
-EMAIL_PORT = 587
+EMAIL_PORT = 465
 
-EMAIL_USE_TLS = True
+# EMAIL_USE_TLS = True
 
-# EMAIL_USE_SSL = True
+EMAIL_USE_SSL = True
 
 EMAIL_HOST_USER = 'yaomingnakel@gmail.com'
 
