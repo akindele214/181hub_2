@@ -61,11 +61,7 @@
               {%if post.is_quote == False%} Repost by{%endif%}
               <a class="mr-2" href="{% url 'user-posts' post.user.username %}">{{ post.user }} {% if post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</i></a>{%if post.is_quote %}quoted a post in a thread{%endif%}
               {% comment %} <p class="article-content">{{ post.content|hashtag_links|mention_link }}</p> {% endcomment %}
-              {% if post.image %}
-                <div class="container col-sm-12 text-center mb-2">
-                  <img src="{{post.image.url}}" alt="..." class="img-thumbnail">
-                </div>
-              {% endif %}
+              
               {%if post.is_quote%}
               <article class="media content-section infinite-item mt-3">
                 <div class="media-body">
@@ -80,6 +76,11 @@
               </article>
               {% endif%}
               <p class="article-content">{{ post.content|hashtag_links|mention_link|urlize }}</p>
+              {% if post.image %}
+                <div class="container col-sm-12 text-center mb-2">
+                  <img src="{{post.image.url}}" alt="..." class="img-thumbnail">
+                </div>
+              {% endif %}
               <p>
               <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small></p>
               </article>
