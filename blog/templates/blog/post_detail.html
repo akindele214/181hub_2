@@ -6,6 +6,47 @@
 {% load staticfiles %}
 {% get_hit_count_js_variables for object as hitcount %}
 {% get_hit_count for object as total_hits %}
+
+<script type="text/javascript">
+{%block jquery%}
+
+function updateText(btn, newCount, verb) {
+  btn.text(newCount +" " + verb)
+}
+
+$(".like-btn").click(function(e){
+  e.preventDefault()
+  var this_ = $(this)
+  console.log(this_)
+  var likeUrl = this_.attr("data-href")
+  var likeCount = parseInt(this_.attr("data-likes"))
+  var addLike = likeCount + 1
+  var removeLike = likeCount - 1 
+  $.ajax({
+    url: likeUrl,
+    method: "GET",
+    data: {},
+    success: function(data){
+      console.log(data.liked)
+      var newLikes;
+      if (data.liked){
+        // add one like
+       newLikes = likeCount + 1
+       updateText(this_, data.like_count, "Unlike")
+      } else {
+        // remove one like
+       newLikes = likeCount - 1
+       updateText(this_, data.like_count, "Like")
+      }
+    }, error: function(error){
+      console.log("error")
+      console.log(error)
+    }
+  })
+})
+{%endblock%}
+</script>
+
 <script src="{% static 'hitcount/jquery.postcsrf.js' %}"></script>
 
 {% get_hit_count_js_variables for object as hitcount %}
@@ -46,7 +87,8 @@ jQuery(document).ready(function($) {
             <div class="article-metadata">
               <img src="{{ object.user.profile.image.url }}" class="rounded-circle article-img">
               <a class="mr-2" href="{% url 'user-posts' object.user.username %}">{{ object.user }} {% if object.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a> 
-              {% if request.user.is_authenticated %}
+            
+              {% comment %} {% if request.user.is_authenticated %}
               {% if object.user == user %}
               
                 <a href="{% url 'post-update' object.id %}" class="btn btn-outline-secondary btn-sm mt-1 mb-1">Edit</a>
@@ -54,7 +96,38 @@ jQuery(document).ready(function($) {
               
               {% endif %}
                 <a href="{% url 'report-post' object.id %}" class="btn btn-outline-secondary btn-sm mt-1 mb-1">Report</a>
-              {%endif%}
+              
+              {%endif%} {% endcomment %}
+
+                <a href="#" style="color: #5f788a;" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-ellipsis-h fa-lg mt-2" style="float: right;"></i></a>
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header"> 
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            {% if request.user.is_authenticated %}
+                            {% if object.user == user %}
+                            
+                              <a href="{% url 'post-update' object.id %}" class="text-center"><p>Edit</p></a>
+                              <hr>
+                              <a href="{% url 'post-delete' object.id %}" class="text-center" style="color: red;"><p>Delete</p></a>       
+                              <hr>
+                            {% endif %}
+                            {%endif%}
+                              <a href="{% url 'report-post' object.id %}" class="text-center"><p>Report</p></a>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button> 
+                          </div>
+                        </div>
+                      </div>
+                    </div>
             </div>
             <h5 class="article-title">{{ object.title }}</h5>
             <p class="article-content mb-3">{{ object.content|hashtag_links|mention_link|urlize }}</p>
@@ -83,16 +156,19 @@ jQuery(document).ready(function($) {
 </div>
 </div>
 {% if object.video %}
-<div class="videowrapper" style="h eight: auto;">
+<div class="videowrapper ">
     <video class="afterglow mb-3" id="myvideo" width="1920"  height="1440" loop="loop" data-volume=".5">
       <source type="video/mp4" src="{{object.video.url}}" />
     </video>
-    <p class="ml-4">Use Full Screen Feature For Better Display</p>
+    <p class="text-center">Use Full Screen Feature For Better Display</p>
 </div>
+
 {% endif %}
             
             <div id="like-section">
             {% include 'blog/like_section.html' %}
+            <a class="like-btn" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+              {{object.likes.count}} Like</a>
             </div>
             <p class="mt-3">
               {% if is_thread %}

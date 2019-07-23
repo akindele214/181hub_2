@@ -1,4 +1,4 @@
-            {{postlikes}}
+        {{post.likes.count}}
          {% if request.user.is_authenticated %}
             <form method="POST" action="{% url 'like_share' %}">
             {%csrf_token%}
@@ -9,11 +9,13 @@
                     <button type="submit" name="post_id" value="{{post.id}}" class="btn btn-link" style="text-decoration: none;"  id="share_like">Like</button>
                 {%endif%}
             {% endfor %}  {% endcomment %}
+            
             {% if request.user in post.likes.all %}  
                     <button type="submit" name="post_id" style="text-decoration: none;  color: red;" value="{{post.id}}" class="btn btn-link" id="share_like">Dislike</button>
             {%else%}
                     <button type="submit" name="post_id" value="{{post.id}}" class="btn btn-link" style="text-decoration: none;"  id="share_like">Like</button>
             {%endif%}
+
             {% comment %} {% if post.likes %}
                 <button type="submit" name="post_id" style="text-decoration: none;  color: red;" value="{{post.id}}" class="btn btn-link" id="share_like">Dislike</button>
             {% else %}

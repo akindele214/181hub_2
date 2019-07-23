@@ -2,6 +2,7 @@ from django.utils import timezone
 import operator
 from urllib.parse import urlencode
 from django.contrib import messages
+from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from .models import Post, Comment, Share, Images, HashTag, ShareTag, Quote, Report
 from django.views.generic import ListView, View, CreateView, UpdateView, DeleteView, RedirectView
@@ -20,6 +21,13 @@ from hitcount.models import HitCount
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+# REST FRAMEWORK
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import authentication, permissions
+from django.contrib.auth.models import User
+
 
 
 # Create your views here.
@@ -65,10 +73,21 @@ class PostListView(ListView):
     def get_queryset(self):
         posts = []
         shared_post = []
+        hash_post = []
+        final_hash_post = []
+        final_post = []
         if self.request.user.is_authenticated:
             user_id = self.request.user.id
             view_user_post = Post.objects.filter(user__exact=self.request.user)
             user_profile = User.objects.get(id=user_id).profile
+
+            date = timedelta(days=7)
+            last_week = timezone.now() - date
+            all_tag = HashTag.objects.filter(date_posted__gt=last_week).exclude(user=self.request.user).values_list('post', flat=True).distinct()
+
+            for postx in all_tag:
+                post_post = Post.objects.get(pk=postx)
+                final_post.append(post_post)
 
             for profile in user_profile.follower.all():
                 for post in Post.objects.filter(user__exact=profile.user):
@@ -78,9 +97,12 @@ class PostListView(ListView):
                 for share in Share.objects.filter(user__exact=profile.user):
                     shared_post.append(share)
 
+            for f_post in final_post:
+                if f_post.user.profile not in user_profile.follower.all():
+                    final_hash_post.append(f_post)
             # logged_in_user_shared_post = Share.objects.filter(post__user=self.request.user)
             logged_in_user_shared_post = Share.objects.filter(user__exact=self.request.user.id)
-            chain_qs = chain(posts, view_user_post, shared_post,logged_in_user_shared_post)
+            chain_qs = chain(posts, view_user_post, shared_post,logged_in_user_shared_post, final_hash_post)
             return sorted(chain_qs, key=lambda x: x.date_posted, reverse=True)
 
         else:
@@ -468,33 +490,111 @@ def like_post(request):
         html = render_to_string('blog/like_section.html', context, request=request)
         return JsonResponse({'form': html})
 
-@login_required
-def like_share(request):
-    post = get_object_or_404(Share, id=request.POST.get('pk'))
-    userid = request.user.id
-    liked_users = None
-    is_liked = False
-    if post.likes.filter(id=userid).exists():
-        post.likes.remove(userid)
-        liked_users = post.likes
-        is_liked = False
-    else:
-        post.likes.add(request.user)
-        is_liked = True
-        liked_users = post.likes.all()
-        notify.send(request.user, recipient=post.user, verb='liked your post in the thread', action_object=post.post)
-    context = {
-        'object': post,
-        'postlikes': post.likes.count(),
-        'post.likes.all': post.likes.all(),
-        # 'is_liked': is_liked, 
-    }
-    # next = request.META.get('HTTP_REFERER', None) or '/'
-    # return HttpResponseRedirect(next)
-    # return HttpResponseRedirect(post.get_absolute_url())
-    if request.is_ajax():
-        html = render_to_string('blog/share_like.html', context, request=request)
-        return JsonResponse({'form': html})
+class PostLikeToggle(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        print(pk)
+        obj = get_object_or_404(Post, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.add(user)
+        return url_
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import authentication, permissions
+from django.contrib.auth.models import User
+
+class PostLikeAPIToggle(APIView):
+    
+    """
+    View to list all users in the system.
+
+    * Requires token authentication.
+    * Only admin users are able to access this view.
+    """
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk=None, format=None):
+        # pk = self.kwargs.get('pk')
+        obj = get_object_or_404(Post, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        updated = False
+        liked = False
+
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+                liked = False
+            else:
+                obj.likes.add(user)
+                liked = True
+                if request.user != obj.user:
+                    notify.send(request.user, recipient=obj.user, verb='liked your post', action_object=obj)
+            updated = True
+        data = {
+            "updated": updated,
+            "liked": liked,
+            "like_count": obj.likes.count()
+        }
+        return Response(data)
+
+class ShareLikeAPIToggle(APIView):
+    
+    """
+    View to list all users in the system.
+
+    * Requires token authentication.
+    * Only authenticated users are able to access this view.
+    """
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk=None, format=None):
+        # pk = self.kwargs.get('pk')
+        obj = get_object_or_404(Share, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        updated = False
+        liked = False
+
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+                liked = False
+            else:
+                obj.likes.add(user)
+                liked = True
+                if request.user != obj.user:
+                    notify.send(request.user, recipient=obj.user, verb='liked your post in a thread', action_object=obj.post,description=obj.content)
+            updated = True
+        data = {
+            "updated": updated,
+            "liked": liked,
+            "like_count": obj.likes.count()
+        }
+        return Response(data)
+
+class ShareLikeToggle(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        print(pk)
+        obj = get_object_or_404(Share, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.add(user)
+        return url_
+
 
 
 class UserPostListView(ListView):
@@ -505,14 +605,14 @@ class UserPostListView(ListView):
         user = get_object_or_404(User, username=username)
         profile_user_id = get_object_or_404(User, username=username).profile
         profile = User.objects.get(username=username).profile
-        posts = Post.objects.filter(user=user).order_by('-date_posted')
+        posts = Post.objects.filter(user=user).order_by('date_posted')
         # self.object_list = Post.objects.filter(user=user).order_by('-date_posted')
         is_user = False
         is_follow = False
         bio_length = len(user.profile.content)
 
 
-        post = Post.objects.filter(user=user).order_by('-date_posted')
+        post = Post.objects.filter(user=user).order_by('date_posted')
         page = request.GET.get('page', 1)
         paginator = Paginator(post, 30)
         try:
@@ -715,8 +815,9 @@ class CreatePostView(LoginRequiredMixin, View):
                 post.save()
                 for word in words.split():
                     if word.startswith("#"):
-                        hash_tag = HashTag(post=post, tag=word)
-                        hash_tag.save()
+                        if len(word) > 1:
+                            hash_tag = HashTag(post=post, tag=word,user=request.user)
+                            hash_tag.save()
                 for word in words.split():
                     if word.startswith("@"):
                         w = word.replace('@', '')
@@ -851,7 +952,7 @@ class EditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
                     for word in new_hashtags:
                         if word.startswith("#"):
                             w = word.replace('#', '')
-                            hash_tag = HashTag(post=post, tag=word)
+                            hash_tag = HashTag(post=post, tag=word,user=request.user)
                             hash_tag.save()
                 data = Images.objects.filter(post=post)
                 return HttpResponseRedirect(reverse('post-detail', kwargs={'pk': pk}))  # HttpResponseRedirect(post.get_absolute_url())
@@ -867,7 +968,7 @@ class EditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
     def test_func(self):
         post = self.get_object()
-        if self.request.user == post.user:
+        if self.request.user == post.user or self.request.user.is_staff:
             return True
         return False
 
@@ -968,6 +1069,12 @@ class QuoteShare(LoginRequiredMixin, CreateView):
                 quote_create = Share.objects.create(post=share_post.post, share_post=share_post, is_quote=True, user=request.user, content = content, image=image)
                 quote_create.save()
                 for word in content.split():
+                    if len(word) > 1:
+                        if word.startswith("#"):
+                            wo = word.replace('#', '')
+                            hash_tag = ShareTag(share=quote_create, tag=wo, user=request.user)
+                            hash_tag.save()
+                for word in content.split():
                     if word.startswith("@"):
                         w = word.replace('@', '')
                         if User.objects.get(username__iexact=w):
@@ -1014,15 +1121,15 @@ class ShareView(LoginRequiredMixin, CreateView):
                 share_create = Share.objects.create(post=post, user=request.user, content=content, image=image)
                 share_create.save()
                 for word in content.split():
-                    if word.startswith("#"):
-                        wo = word.replace('#', '')
-                        hash_tag = ShareTag(share=share_create, tag=wo, user=request.user)
-                        hash_tag.save()
+                    if len(word) > 1:
+                        if word.startswith("#"):
+                            wo = word.replace('#', '')
+                            hash_tag = ShareTag(share=share_create, tag=wo, user=request.user)
+                            hash_tag.save()
                 for word in content.split():
                     if word.startswith("@"):
                         w = word.replace('@', '')
-                        if User.objects.get(username__iexact=w):
-                            print(content)
+                        if User.objects.get(username__iexact=w): 
                             notify.send(request.user, recipient=User.objects.get(username__iexact=w),
                                         verb='mentioned you in a post thread', action_object=post, description=content)
                         else:

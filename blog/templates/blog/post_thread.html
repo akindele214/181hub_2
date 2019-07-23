@@ -3,6 +3,49 @@
 {% load crispy_forms_tags %}
 {% block title %}{{ori_post.title}} Thread- {{block.super}}{%endblock%}
 {% block content %}
+
+
+<script type="text/javascript">
+{%block jquery%}
+
+function updateText(btn, newCount, verb) {
+  // btn.text(newCount +" " + verb)
+  // console.log(btn.attr("class"))
+  // console.log(btn.children()[0])
+  // console.log(btn.html())
+  btn.html(verb + " " + newCount)
+}
+
+$(".like-btn").click(function(e){
+  e.preventDefault()
+  var this_ = $(this)
+  var likeUrl = this_.attr("data-href")
+  var likeCount = parseInt(this_.attr("data-likes"))
+  var addLike = likeCount + 1
+  var removeLike = likeCount - 1 
+  $.ajax({
+    url: likeUrl,
+    method: "GET",
+    data: {},
+    success: function(data){
+      console.log(data)
+      var newLikes;
+      if (data.liked){ 
+       newLikes = likeCount + 1 
+       updateText(this_, data.like_count, '<i class="fas fa-heart  fa-lg"></i>')
+      } else { 
+       newLikes = likeCount - 1 
+       updateText(this_, data.like_count, "<i class='far fa-heart  fa-lg'></i>")
+      }
+    }, error: function(error){
+      console.log("error")
+      console.log(error)
+    }
+  })
+})
+{%endblock%}
+</script>
+
         <article class="media content-section mb-0">
           <div class="media-body">
             <div class="article-metadata">
@@ -32,12 +75,47 @@
               <div class="article-metadata-share">
               <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
               <a class="mr-2" href="{% url 'user-posts' post.user.username %}"> {{ post.user }} {% if post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a> 
+                
+                {% comment %} {%if request.user.is_authenticated%}
                 {% if post.user == user %}
                 <small class="text-muted"> 
                 <a href="{% url 'share-edit' post.id %}" class="btn btn-outline-secondary btn-sm mt-1 mb-1">Edit</a></small>  
-              <small class="text-muted"> 
+                <small class="text-muted"> 
                 <a href="{% url 'share-delete' post.id %}" class="btn btn-outline-danger btn-sm mt-1 mb-1">Delete</a></small>   
-              {% endif %}  
+                {% endif %}
+                <a href="{% url 'report-share' post.id %}" class="btn btn-outline-secondary btn-sm mt-1 mb-1">Report</a>
+                {% endif %} {% endcomment %}
+
+                <a href="#" style="color: #5f788a;" data-toggle="modal" data-target="#exampleModalCenter-{{post.id}}"><i class="fas fa-ellipsis-h fa-lg mt-2" style="float: right;"></i></a>
+                                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModalCenter-{{post.id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header"> 
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            {% if request.user.is_authenticated %}
+                            {% if post.user == user %}
+                            
+                              <a href="{% url 'share-edit' post.id %}" class="text-center"><p>Edit</p></a>
+                              <hr>
+                              <a href="{% url 'share-delete' post.id %}" class="text-center" style="color: red;"><p>Delete</p></a>       
+                              <hr>
+                            {% endif %}
+                            {%endif%}
+                              <a href="{% url 'report-share' post.id %}" class="text-center"><p>Report</p></a>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button> 
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
             </div>
               {%if post.is_quote%}
               <article class="media content-section infinite-item mt-3">
@@ -61,9 +139,16 @@
 
               <p class="mt-3">
               <small class="text-muted" style="float: left;">
-                <a href="{% url 'quote-share' post.id %}" class="text-muted">Quote</a>
-                <a href="{% url 'report-share' post.id %}" class="text-muted ml-2">Report</a>
-                  
+                <a href="{% url 'quote-share' post.id %}" class="text-muted"><i class="fas fa-exchange-alt mr-3 fa-lg"></i></a>
+
+                <!--Share Like-->
+                {% if request.user in post.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {% endif %}
               </small>
               <small class="text-muted" style="float: right;">{{ post.date_posted|timesince|upto:','  }} ago</small>
               </p>

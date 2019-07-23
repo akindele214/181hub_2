@@ -2,20 +2,28 @@
             {% if request.user.is_authenticated %}
             <form method="POST" action="{% url 'like_post' %}">
             {%csrf_token%}
+        
             {% if is_liked %}
-                <button type="submit" name="post_id" style="text-decoration: none;  color: red;" value="{{object.id}}" class="btn btn-link" id="like">Dislike</button>
+                <a name="post_id" style="text-decoration: none;  color: #5f788a;" value="{{object.id}}" id="like"><i class="fas fa-heart fa-lg mt-2"></i></a>
             {% else %}
-                <button type="submit" name="post_id" value="{{object.id}}" class="btn btn-link" style="text-decoration: none;"  id="like">Like</button>
-            {% endif %}
+                <a name="post_id" value="{{object.id}}" style="text-decoration: none; color: #5f788a;"  id="like"><i class="far fa-heart fa-lg mt-2"></i></a>
+            {% endif %} 
+            {% comment %} {% if is_liked %}
+                <a name="post_id" style="text-decoration: none;  color: #5f788a;" value="{{object.id}}" id="like"><i class="fas fa-heart fa-lg mt-2"></i></a>
+            {% else %}
+                <a name="post_id" value="{{object.id}}" style="text-decoration: none; color: #5f788a;"  id="like"><i class="far fa-heart fa-lg mt-2"></i></a>
+            {% endif %} {% endcomment %}
+
               {% if is_saved %}
-                <a href="{% url 'save_post' pk=object.id %}" style="text-decoration: none;"><i class="fas fa-bookmark fa-lg ml-2 mt-2" id="save"></i>
+                <a href="{% url 'save_post' pk=object.id %}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
                 </a>
               {% else %}
-                <a href="{% url 'save_post' pk=object.id %}" data-toggle="tooltip" title="Save Post" style="text-decoration: none;"><i class="far fa-bookmark fa-lg ml-2" id="save" ></i>
+                <a href="{% url 'save_post' pk=object.id %}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
                 </a>
               {% endif %}
-              <a href="{% url 'share_post' pk=object.id %}" data-toggle="tooltip" title="Share Post">
-              <i class="fas fa-exchange-alt ml-2 fa-lg"></i>
+
+              <a href="{% url 'share_post' pk=object.id %}" style="text-decoration: none; color: #5f788a;" data-toggle="tooltip" title="Share Post">
+              <i class="fas fa-exchange-alt ml-3 fa-lg"></i>
               </a>
           </form>
               

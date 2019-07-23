@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Comment, Share, Report
+from .models import Post, Comment, Share, Report, HashTag, ShareTag
 
 # Register your models here.
 
@@ -20,7 +20,15 @@ class ShareAdmin(admin.ModelAdmin):
 class ReportAdmin(admin.ModelAdmin):
     list_display = ('user', 'post', 'shared_post')
 
+class HashTagAdmin(admin.ModelAdmin):
+    list_display = ('user', 'post' , 'tag')
+
+class ShareTagAdmin(admin.ModelAdmin):
+    list_display = ('user', 'share' , 'tag')
+
+admin.site.register(HashTag, HashTagAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(Share, ShareAdmin)
+admin.site.register(ShareTag, ShareTagAdmin)
 admin.site.register(Report, ReportAdmin)

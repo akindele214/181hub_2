@@ -11,6 +11,8 @@ from chat.views import ChatReport
 
 
 urlpatterns = [
+    url(r'^api-auth/', include('rest_framework.urls')),
+     
     path('admin/', admin.site.urls),
     path('live_counter/', user_views.live_counter, name='live_counter'),
     path('', include('blog.urls')),

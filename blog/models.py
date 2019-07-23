@@ -13,7 +13,6 @@ from taggit.managers import TaggableManager
 from django.core.validators import FileExtensionValidator
 from django.utils.encoding import python_2_unicode_compatible
 from PIL import Image
-# Create your models here.
 
 
 class PostManager(models.Manager):
@@ -51,6 +50,12 @@ class Post(models.Model, HitCountMixin):
 
     def get_absolute_url(self):
         return reverse('post-detail', kwargs={'pk': self.pk})
+
+    def get_like_url(self):
+        return reverse("like-toggle",kwargs={'pk': self.pk})
+    
+    def get_api_like_url(self):
+        return reverse("like-api-toggle",kwargs={'pk': self.pk})
 
     class Meta:
         verbose_name = 'Post'
@@ -94,6 +99,12 @@ class Share(models.Model):
 
     def get_absolute_url(self):
         return reverse('share-thread', kwargs={'pk': self.post.pk})
+
+    def get_like_url(self):
+        return reverse("share-like-toggle",kwargs={'pk': self.pk})
+    
+    def get_api_like_url(self):
+        return reverse("share-like-api-toggle",kwargs={'pk': self.pk})
 
     class Meta:
         verbose_name = 'Share'

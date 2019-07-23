@@ -5,7 +5,8 @@ from .views import (PostListView,
                     saved_post_list,
                     home,
                     SearchView,
-                    save_post, like_post,
+                    save_post, 
+                    like_post,
                     PostCreateView,
                     PostUpdateView,
                     PostDeleteView,
@@ -14,7 +15,6 @@ from .views import (PostListView,
                     UserPostListView,
                     postdetail,
                     edit_post,
-                    like_share,
                     view_following,
                     EditView,
                     ShareDeleteView,
@@ -27,6 +27,10 @@ from .views import (PostListView,
                     PostReport,
                     ShareReport,
                     user_post,
+                    PostLikeToggle,
+                    PostLikeAPIToggle,
+                    ShareLikeToggle,
+                    ShareLikeAPIToggle,
                     Trending)
 from . import views
 import notifications.urls
@@ -44,6 +48,11 @@ urlpatterns = [
     path('post/new/', CreatePostView.as_view(), name='post-create'),
     path('create/', CreatePostView.as_view(), name='create-post'),
     path('like/', like_post, name='like_post'),
+    
+    path('post/<int:pk>/like', PostLikeToggle.as_view(), name='like-toggle'),
+    path('api/post/<int:pk>/like', PostLikeAPIToggle.as_view(), name='like-api-toggle'),
+
+
     path('saved/', SavedPostListView.as_view(), name='saved'),
     path('search/', SearchView.as_view(), name='blog-search'),
     path('hashtag/<str:hash>/', HashSearchView.as_view(), name='hash-search'),
@@ -57,7 +66,10 @@ urlpatterns = [
     path('share/<int:pk>/delete/', ShareDeleteView.as_view(), name='share-delete'),
     path('share/<int:pk>/update/', ShareEditView.as_view(), name='share-edit'),
     path('share/<int:pk>/', ShareView.as_view(), name='share_post'),
-    path('like_share/', like_share, name='like_share'),
+    
+    path('share/<int:pk>/like', ShareLikeToggle.as_view(), name='share-like-toggle'),
+    path('api/share/<int:pk>/like', ShareLikeAPIToggle.as_view(), name='share-like-api-toggle'),
+
     path('report/<int:pk>/share/', ShareReport.as_view(), name='report-share'),
 
     # QUOTE

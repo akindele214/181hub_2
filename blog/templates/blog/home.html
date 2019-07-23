@@ -20,7 +20,12 @@
                   {% if post.video  %}
               <span class="badge badge-secondary ml-2"><small>VID</small></span>
                   {% endif %}</h5>
-              <p class="article-content">{{ post.content|truncatewords:"19"|hashtag_links|mention_link|urlize }}</p>
+              <p class="article-content" style="white-space:normal;">{{ post.content|truncatewords:"30"|hashtag_links|mention_link|urlize }}
+              {% ifnotequal post.content|truncatewords:"30"|length post.content|truncatewords:"31"|length %}
+              <a href="{% url 'post-detail' post.pk %}" class="mt-0" >read more</a>
+              {% endifnotequal %}
+              </p>
+
           </div>
         </article>
       {% elif class == 'Share' %}
