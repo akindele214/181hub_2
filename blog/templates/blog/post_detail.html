@@ -10,14 +10,18 @@
 <script type="text/javascript">
 {%block jquery%}
 
-function updateText(btn, newCount, verb) {
-  btn.text(newCount +" " + verb)
+{% comment %} function updateText(btn, newCount, verb) {
+  btn.html(verb +" " + newCount)
 }
+
+function updateBookmark(btn, verb) {
+  btn.html(verb)
+}
+
 
 $(".like-btn").click(function(e){
   e.preventDefault()
   var this_ = $(this)
-  console.log(this_)
   var likeUrl = this_.attr("data-href")
   var likeCount = parseInt(this_.attr("data-likes"))
   var addLike = likeCount + 1
@@ -27,16 +31,14 @@ $(".like-btn").click(function(e){
     method: "GET",
     data: {},
     success: function(data){
-      console.log(data.liked)
+      console.log(data)
       var newLikes;
-      if (data.liked){
-        // add one like
-       newLikes = likeCount + 1
-       updateText(this_, data.like_count, "Unlike")
-      } else {
-        // remove one like
-       newLikes = likeCount - 1
-       updateText(this_, data.like_count, "Like")
+      if (data.liked){ 
+       newLikes = likeCount + 1 
+       updateText(this_, data.like_count, '<i class="fas fa-heart fa-lg"></i>')
+      } else { 
+       newLikes = likeCount - 1 
+       updateText(this_, data.like_count, "<i class='far fa-heart fa-lg'></i>")
       }
     }, error: function(error){
       console.log("error")
@@ -44,6 +46,30 @@ $(".like-btn").click(function(e){
     }
   })
 })
+
+$(".save-btn").click(function(e){
+  e.preventDefault()
+  var this_ = $(this)
+  var likeUrl = this_.attr("data-href")
+  $.ajax({
+    url: likeUrl,
+    method: "GET",
+    data: {},
+    success: function(data){
+      console.log(data)
+      var newLikes;
+      if (data.is_saved){ 
+       updateBookmark(this_, '<i class="fas fa-bookmark fa-lg ml-2 mt-2""></i>')
+      } else {
+       updateBookmark(this_, "<i class='far fa-bookmark fa-lg ml-2 mt-2'></i>")
+      }
+    }, error: function(error){
+      console.log("error")
+      console.log(error)
+    }
+  })
+}) {% endcomment %}
+
 {%endblock%}
 </script>
 
@@ -165,11 +191,31 @@ jQuery(document).ready(function($) {
 
 {% endif %}
             
-            <div id="like-section">
-            {% include 'blog/like_section.html' %}
-            <a class="like-btn" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
-              {{object.likes.count}} Like</a>
-            </div>
+          <div id="like-section">
+            {%if request.user.is_authenticated%}
+            {% if request.user in object.likes.all %}
+            <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+            <i class="fas fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+            {%else%}
+            <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+            <i class="far fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+            {% endif %}
+            <a href="{% url 'share_post' pk=object.id %}" style="text-decoration: none; color: #5f788a;" data-toggle="tooltip" title="Share Post">
+            <i class="fas fa-exchange-alt ml-2 fa-lg"></i></a>      
+
+            {% if is_saved %}
+            <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-2 mt-2" id="save"></i>
+            </a>
+            {% else %}
+            <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-2 mt-2" id="save" ></i>
+            </a>
+            {% endif %}
+            {%else%}
+            <a href="{%url 'login'%}"><small class="text-muted" style="float: left;">log in to like and share post</small></a>
+            <br>
+            {%endif%}
+            
+          </div>
             <p class="mt-3">
               {% if is_thread %}
               <small class="text-muted" style="float: left;"><a href="{% url 'share-thread' object.pk %}" style="text-decoration: none;"> View Thread </a></small>
@@ -177,17 +223,7 @@ jQuery(document).ready(function($) {
               <small class="text-muted" style="float: right;">{{ object.date_posted|timesince|upto:',' }} ago &nbsp;&nbsp;
                <i class="far fa-eye"></i> {{ object_hits }} view{{ object_hits|pluralize}}</small> 
             </p> 
-            {% comment %} 
-            <div id="favourite-section">
-              {% if is_saved %}
-              <a href="{% url 'save_post' pk=object.id %}"><i class="fas fa-bookmark fa-lg"></i>
-              </a>
-              {% else %}
-              <a href="{% url 'save_post' pk=object.id %}"><i class="far fa-bookmark fa-lg"></i>
-              </a>
-              {% endif %}
-            </div> 
-            {% endcomment %}
+
             
           </div>
 

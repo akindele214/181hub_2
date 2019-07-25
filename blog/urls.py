@@ -27,10 +27,12 @@ from .views import (PostListView,
                     PostReport,
                     ShareReport,
                     user_post,
-                    PostLikeToggle,
-                    PostLikeAPIToggle,
                     ShareLikeToggle,
                     ShareLikeAPIToggle,
+                    SavePostAPIToggle,
+                    SavePostToggle,
+                    PostLikeToggle,
+                    PostLikeAPIToggle,
                     Trending)
 from . import views
 import notifications.urls
@@ -49,9 +51,10 @@ urlpatterns = [
     path('create/', CreatePostView.as_view(), name='create-post'),
     path('like/', like_post, name='like_post'),
     
-    path('post/<int:pk>/like', PostLikeToggle.as_view(), name='like-toggle'),
-    path('api/post/<int:pk>/like', PostLikeAPIToggle.as_view(), name='like-api-toggle'),
-
+    path('post/<int:pk>/like/', PostLikeToggle.as_view(), name='like-toggle'),
+    path('api/post/<int:pk>/like/', PostLikeAPIToggle.as_view(), name='like-api-toggle'),
+    path('post/<int:pk>/save/', SavePostToggle.as_view(), name='save-post-toggle'),
+    path('api/post/<int:pk>/save/', SavePostAPIToggle.as_view(), name='save-api-toggle'),
 
     path('saved/', SavedPostListView.as_view(), name='saved'),
     path('search/', SearchView.as_view(), name='blog-search'),

@@ -21,9 +21,35 @@
               <span class="badge badge-secondary ml-2"><small>VID</small></span>
                   {% endif %}</h5>
               <p class="article-content" style="white-space:normal;">{{ post.content|truncatewords:"30"|hashtag_links|mention_link|urlize }}
-              {% ifnotequal post.content|truncatewords:"30"|length post.content|truncatewords:"31"|length %}
+              
+               {% ifnotequal post.content|truncatewords:"30"|length post.content|truncatewords:"31"|length %}
               <a href="{% url 'post-detail' post.pk %}" class="mt-0" >read more</a>
               {% endifnotequal %}
+              </p>
+              <p>
+              <small class="text-muted" style="float: left;">
+
+                <!--Post Like-->
+                {%if request.user.is_authenticated%}
+                {% if request.user in post.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {% endif %}          
+                <a href="{% url 'share_post' pk=post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a>
+                {% if request.user in post.saved.all %}
+                <a class="save-btn" href="{{post.get_save_url}}" data-href="{{post.get_api_save_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
+                </a>
+                {% else %}
+                <a class="save-btn" href="{{post.get_save_url}}" data-href="{{post.get_api_save_url}}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
+                </a>
+                {% endif %}      
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
+                {%endif%}
+              </small>
               </p>
 
           </div>
@@ -87,7 +113,24 @@
                 </div>
               {% endif %}
               <p>
-              <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small></p>
+              
+                <small class="text-muted">
+
+                <!--Share Like-->
+                {%if request.user.is_authenticated%}
+                {% if request.user in post.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {% endif %}
+                <a href="{% url 'quote-share' post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a>
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
+                {%endif%}
+              </small>
+              <small class="text-muted" style="float: right;">{{ post.date_posted|timesince|upto:','  }} ago</small></p>
               </article>
               
               <p style="text-align: center;"><a href="{% url 'share-thread' post.post.pk %}" style="text-decoration: none; color: black;">View Thread</a></p>

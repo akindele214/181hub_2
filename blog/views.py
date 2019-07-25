@@ -317,10 +317,10 @@ class PostDetailView(PostMixinDetailView, HitCountDetailView):
         if Share.objects.filter(post__exact=pk).exists():
             is_thread = True
 
-        if post.likes.filter(id__exact=UserId).exists():
+        if UserId in post.likes.all():
             is_liked = True
 
-        if post.saved.filter(id__exact=UserId).exists():
+        if request.user in post.saved.all():
             is_saved = True 
         context = {
             'object': post,
@@ -346,10 +346,10 @@ class PostDetailView(PostMixinDetailView, HitCountDetailView):
         if Share.objects.filter(post__exact=pk).exists():
             is_thread = True
 
-        if post.likes.filter(id__exact=UserId).exists():
+        if UserId in post.likes.all():
             is_liked = True
 
-        if post.saved.filter(id__exact=UserId).exists():
+        if request.user in post.saved.all():
             is_saved = True
 
         if request.method == 'POST':
@@ -504,11 +504,6 @@ class PostLikeToggle(LoginRequiredMixin, RedirectView):
                 obj.likes.add(user)
         return url_
 
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import authentication, permissions
-from django.contrib.auth.models import User
-
 class PostLikeAPIToggle(APIView):
     
     """
@@ -578,6 +573,43 @@ class ShareLikeAPIToggle(APIView):
             "updated": updated,
             "liked": liked,
             "like_count": obj.likes.count()
+        }
+        return Response(data)
+
+class SavePostToggle(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        post = get_object_or_404(Post, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        if user.is_authenticated:
+            if user in post.likes.all():
+                post.saved.remove(user)
+            else:
+                post.saved.add(user)
+        return url_
+
+class SavePostAPIToggle(APIView):
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk=None, format=None):
+        post = get_object_or_404(Post, pk=pk)
+        is_saved = False
+        updated = False
+        url_ = post.get_absolute_url()
+        user = self.request.user
+        if user.is_authenticated:
+            if user in post.saved.all():
+                post.saved.remove(request.user)
+                is_saved = False
+            else:
+                post.saved.add(request.user)
+                is_saved = True
+            updated = True
+        data = {
+            'updated': updated,
+            'is_saved': is_saved
         }
         return Response(data)
 

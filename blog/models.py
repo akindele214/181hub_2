@@ -52,15 +52,17 @@ class Post(models.Model, HitCountMixin):
         return reverse('post-detail', kwargs={'pk': self.pk})
 
     def get_like_url(self):
-        return reverse("like-toggle",kwargs={'pk': self.pk})
-    
+        return reverse("like-toggle", kwargs={'pk': self.pk})
+
     def get_api_like_url(self):
         return reverse("like-api-toggle",kwargs={'pk': self.pk})
-
-    class Meta:
-        verbose_name = 'Post'
-        verbose_name_plural = 'Posts'
-
+    
+    def get_api_save_url(self):
+        return reverse("save-api-toggle", kwargs={'pk': self.pk})
+    
+    def get_save_url(self):
+        return reverse("save-post-toggle", kwargs={'pk': self.pk})
+    
 
 class Images(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

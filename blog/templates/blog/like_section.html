@@ -3,7 +3,7 @@
             <form method="POST" action="{% url 'like_post' %}">
             {%csrf_token%}
         
-            {% if is_liked %}
+            {% if request.user in object.likes.all %}
                 <a name="post_id" style="text-decoration: none;  color: #5f788a;" value="{{object.id}}" id="like"><i class="fas fa-heart fa-lg mt-2"></i></a>
             {% else %}
                 <a name="post_id" value="{{object.id}}" style="text-decoration: none; color: #5f788a;"  id="like"><i class="far fa-heart fa-lg mt-2"></i></a>

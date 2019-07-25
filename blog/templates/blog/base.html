@@ -33,36 +33,76 @@
 
     <script>
     $(document).ready(function(){
-      {%block jquery%} {%endblock%}
+      function updateText(btn, newCount, verb) {
+    btn.html(verb +" " + newCount)
+    }
+
+    function updateBookmark(btn, verb) {
+     btn.html(verb)
+    } 
+
+
+    $(".like-btn").click(function(e){
+      e.preventDefault()
+      var this_ = $(this)
+      var likeUrl = this_.attr("data-href")
+      var likeCount = parseInt(this_.attr("data-likes"))
+      var addLike = likeCount + 1
+      var removeLike = likeCount - 1 
+      $.ajax({
+        url: likeUrl,
+        method: "GET",
+        data: {},
+        success: function(data){
+          console.log(data)
+          var newLikes;
+          if (data.liked){ 
+          newLikes = likeCount + 1 
+          updateText(this_, data.like_count, '<i class="fas fa-heart fa-lg"></i>')
+          } else { 
+          newLikes = likeCount - 1 
+          updateText(this_, data.like_count, "<i class='far fa-heart fa-lg'></i>")
+          }
+        }, error: function(error){
+          console.log("error")
+          console.log(error)
+        }
+      })
+    })
+
+    $(".save-btn").click(function(e){
+      e.preventDefault()
+      var this_ = $(this)
+      var likeUrl = this_.attr("data-href")
+      $.ajax({
+        url: likeUrl,
+        method: "GET",
+        data: {},
+        success: function(data){
+          console.log(data)
+          var newLikes;
+          if (data.is_saved){ 
+          updateBookmark(this_, '<i class="fas fa-bookmark fa-lg ml-2 mt-2""></i>')
+          } else {
+          updateBookmark(this_, "<i class='far fa-bookmark fa-lg ml-2 mt-2'></i>")
+          }
+        }, error: function(error){
+          console.log("error")
+          console.log(error)
+        }
+      })
+    })
+    {%block jquery%} {%endblock%}
     })
     </script> 
 
     <script type="text/javascript">
      $(document).ready(function(event){
-          $(document).on('click', '#like', function(event){
-          event.preventDefault();
-          var pk = $(this).attr('value');
-          $.ajax({
-            type: 'POST',
-            url: "{%url 'like_post'%}",
-            data: {'id':pk, 'csrfmiddlewaretoken': '{{ csrf_token }}'},
-            dataType: 'json',
-            success: function(response){
-              $('#like-section').html(response['form'])
-              console.log($('#like-section').html(response['form']));
-            },
-            error: function(rs, e){
-              console.log(rs.responseText);
-            },
-          });
-        });
-
-
-            $('.reply-btn').click(function() {
+          $('.reply-btn').click(function() {
           $(this).parent().parent().next('.replied-comments').fadeToggle()
         });
 
-      });
+    });
     </script>
     <script type="text/javascript">
         $(document).on('submit', '.comment-form', function(event){
