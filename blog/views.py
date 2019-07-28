@@ -106,7 +106,9 @@ class PostListView(ListView):
             return sorted(chain_qs, key=lambda x: x.date_posted, reverse=True)
 
         else:
-            posts = Post.objects.all().order_by('?')
+            date = timedelta(days=8)
+            last_week = timezone.now() - date
+            posts = Post.objects.all().exclude(date_posted__lt=last_week).order_by('?')
             return posts
 
 class Trending(ListView):
@@ -821,7 +823,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 
 class CreatePostView(LoginRequiredMixin, View):
     model = Post
-    fields = ['title', 'content', 'restrict_comment']
+    # fields = ['title', 'content', 'restrict_comment']
     template_name = 'post_form.html'
 
     def get(self, request):

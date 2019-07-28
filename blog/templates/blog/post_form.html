@@ -22,9 +22,16 @@
   
 uploadField.onchange = function() {
     if(this.files[0].size > 52428800 ){
-       alert("File is too big!");
+       alert("File exceeds 50MB!");
        this.value = "";
     };
 };
+ var uploadMp = document.getElementById('id_audio')
+ uploadMp.onchange = function () {
+     if(this.files[0].size > 11534336){
+         alert("File exceeds 11MB!");
+         this.value = "";
+     }
+ }
 </script>
 {% endblock content %}

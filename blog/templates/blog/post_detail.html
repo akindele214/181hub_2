@@ -43,24 +43,12 @@ jQuery(document).ready(function($) {
   });
 });
 </script>
-
         <article class="media content-section">
           <div class="media-body">
             <div class="article-metadata">
               <img src="{{ object.user.profile.image.url }}" class="rounded-circle article-img">
               <a class="mr-2" href="{% url 'user-posts' object.user.username %}">{{ object.user }} {% if object.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a> 
-            
-              {% comment %} {% if request.user.is_authenticated %}
-              {% if object.user == user %}
-              
-                <a href="{% url 'post-update' object.id %}" class="btn btn-outline-secondary btn-sm mt-1 mb-1">Edit</a>
-                <a href="{% url 'post-delete' object.id %}" class="btn btn-outline-danger btn-sm mt-1 mb-1">Delete</a>
-              
-              {% endif %}
-                <a href="{% url 'report-post' object.id %}" class="btn btn-outline-secondary btn-sm mt-1 mb-1">Report</a>
-              
-              {%endif%} {% endcomment %}
-
+        
                 <a href="#" style="color: #5f788a;" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-ellipsis-h fa-lg mt-2" style="float: right;"></i></a>
                     <!-- Modal -->
                     <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
@@ -119,12 +107,27 @@ jQuery(document).ready(function($) {
 </div>
 {% if object.video %}
 <div class="videowrapper ">
-    <video class="afterglow mb-3" id="myvideo" width="1920"  height="1440" loop="loop" data-volume=".5">
+    <video class="afterglow mb-3" id="myvideo" width="1920"  height="1080" loop="loop" data-volume=".5">
       <source type="video/mp4" src="{{object.video.url}}" />
     </video>
     <p class="text-center">Use Full Screen Feature For Better Display</p>
 </div>
 
+{% endif %}
+
+{% if object.audio %}
+<script src="{%static 'blog/audioplayer.js'%}"></script>
+<div class="text-center mb-3">
+		<audio preload="auto" controls>
+			<source src="{{object.audio.url}}">
+		</audio>
+    <a href="{{object.audio.url}}" class="text-muted">Click To Download Mp3</a>
+</div>
+		<script>
+			$(function() {
+				$('audio').audioPlayer();
+			});
+		</script>
 {% endif %}
             
           <div id="like-section">

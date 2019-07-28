@@ -19,10 +19,13 @@
                   {% endif %}
                   {% if post.video  %}
               <span class="badge badge-secondary ml-2"><small>VID</small></span>
+                  {% endif %}
+                  {% if post.audio  %}
+              <span class="badge badge-secondary ml-2"><small>AUD</small></span>
                   {% endif %}</h5>
-              <p class="article-content" style="white-space:normal;">{{ post.content|truncatewords:"30"|hashtag_links|mention_link|urlize }}
+              <p class="article-content" style="white-space:normal;">{{ post.content|truncatewords:"50"|hashtag_links|mention_link|urlize }}
               
-               {% ifnotequal post.content|truncatewords:"30"|length post.content|truncatewords:"31"|length %}
+               {% ifnotequal post.content|truncatewords:"50"|length post.content|truncatewords:"51"|length %}
               <a href="{% url 'post-detail' post.pk %}" class="mt-0" >read more</a>
               {% endifnotequal %}
               </p>
@@ -62,37 +65,30 @@
               <a class="mr-2" href="{% url 'user-posts' post.post.user.username %}">{{ post.post.user }}{% if post.post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
             </div>
             <h5><a class="article-title" href="{% url 'post-detail' post.post.pk %}">{{ post.post.title }}</a>
-                {% if post.images_set.count >= 1 %}
+                {% if post.post.images_set.count >= 1 %}
               <span class="badge badge-secondary ml-2" data-toggle="modal" data-target="#exampleModalCenter{{ post.title }}"><small>IMG</small></span> 
               {% include 'blog/modal.html'%}
                   {% endif %}
-                {% if post.video %}
+                {% if post.post.video %}
               <span class="badge badge-secondary ml-2">VID</span>
+                  {% endif %}
+                  {% if post.post.audio  %}
+              <span class="badge badge-secondary ml-2"><small>AUD</small></span>
                   {% endif %}</h5>
-              <p class="article-content">{{ post.post.content|truncatewords:"50"|hashtag_links|mention_link|urlize}}</p>
+              <p class="article-content" style="white-space: normal;">{{ post.post.content|truncatewords:"50"|hashtag_links|mention_link|urlize}}
+              {% ifnotequal post.post.content|truncatewords:"50"|length post.post.content|truncatewords:"51"|length %}
+              <a href="{% url 'post-detail' post.post.pk %}" class="mt-0" >read more</a>
+              {% endifnotequal %}
+              </p>
               <p>
                 <small class="text-muted">{{ post.post.date_posted|timesince|upto:','  }} ago</small>
               </p>
               <div class="article-metadata"></div>
-              {% comment %} {%if post.is_quote%}
-              <article class="media content-section infinite-item mt-3">
-                <div class="media-body">
-                  <div class="article-metadata">
-                    <img src="{{ post.share_post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
-                    <a class="mr-2" href="{% url 'user-posts' post.share_post.user.username %}">@{{ post.share_post.user.username }} {% if post.share_post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
-                    <small class="text-muted">{{ post.share_post.date_posted|date:"F d, Y" }} </small>
-                  </div>
-                    <p class="article-content">{{ post.share_post.content|hashtag_links|mention_link }}</p>
-                </div>
-
-              </article>
-              {% endif%} {% endcomment %}
               <article class="article-metadata-share">
               <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
               {%if post.is_quote == False%} Repost by{%endif%}
               <a class="mr-2" href="{% url 'user-posts' post.user.username %}">{{ post.user }} {% if post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</i></a>{%if post.is_quote %}quoted a post in a thread{%endif%}
-              {% comment %} <p class="article-content">{{ post.content|hashtag_links|mention_link }}</p> {% endcomment %}
-              
+         
               {%if post.is_quote%}
               <article class="media content-section infinite-item mt-3">
                 <div class="media-body">

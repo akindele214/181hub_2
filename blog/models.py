@@ -35,6 +35,7 @@ class Post(models.Model, HitCountMixin):
     date_posted = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     video = models.FileField(upload_to='uploads/', blank=True, null=True, validators=[FileExtensionValidator(["mp4"])])
+    audio = models.FileField(upload_to='audio/', blank=True, null=True, validators=[FileExtensionValidator(["mp3"])])
     restrict_comment = models.BooleanField(default=False)
     saved = models.ManyToManyField(User, related_name='saved_post', blank=True)
     hit_count_generic = GenericRelation(

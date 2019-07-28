@@ -5,6 +5,7 @@ from django import forms
 
 class PostCreateForm(forms.ModelForm):
     video = forms.FileField(label="Upload Video(.mp4) File Less Than 50MB", widget=forms.ClearableFileInput(attrs={'accept': ".mp4"}), required=False)
+    audio = forms.FileField(label="Upload Audio File(.mp3) File Less Than 11MB", widget=forms.ClearableFileInput(attrs={'accept': ".mp3"}), required=False)
 
     class Meta:
         model = Post
@@ -13,11 +14,13 @@ class PostCreateForm(forms.ModelForm):
             'content',
             'restrict_comment',
             'video',
+            'audio',
         )
 
 
 class PostEditForm(forms.ModelForm):
     video = forms.FileField(label="Upload Video(.mp4) File Less Than 50MB", widget=forms.ClearableFileInput(attrs={'accept': ".mp4"}), required=False)
+    audio = forms.FileField(label="Upload Audio File(.mp3) File Less Than 11MB", widget=forms.ClearableFileInput(attrs={'accept': ".mp3"}), required=False)
 
     class Meta:
         model = Post
@@ -26,6 +29,7 @@ class PostEditForm(forms.ModelForm):
             'content',
             'restrict_comment',
             'video',
+            'audio',
         )
 
 

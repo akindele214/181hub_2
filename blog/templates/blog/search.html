@@ -32,10 +32,48 @@
               <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
             </div>
             <h5><a class="article-title" href="{% url 'post-detail' object.pk %}">{{ object.title }}</a>
-                {% if object.image or object.image_3 or object.image_2 %}
-              <span class="badge badge-secondary ml-2">IMG</span>
-                  {% endif %}</h5>
-              <p class="article-content">{{ object.content|truncatewords:"30"|hashtag_links|mention_link|urlize }}</p>
+                {% if object.images_set.count >= 1 %}
+              <span class="badge badge-secondary ml-2" data-toggle="modal" data-target="#exampleModalCenter{{ object.pk }}"><small>IMG</small></span>
+                  {% include 'blog/modal.html'%}
+                  {% endif %}
+                  {% if object.video  %}
+              <span class="badge badge-secondary ml-2"><small>VID</small></span>
+                  {% endif %}
+                  {% if object.audio  %}
+              <span class="badge badge-secondary ml-2"><small>AUD</small></span>
+                  {% endif %}
+            </h5>
+              <p class="article-content" style="white-space: normal;">{{ object.content|truncatewords:"50"|hashtag_links|mention_link|urlize }}
+               
+               {% ifnotequal object.content|truncatewords:"50"|length object.content|truncatewords:"51"|length %}
+              <a href="{% url 'post-detail' object.pk %}" class="mt-0" >read more</a>
+              {% endifnotequal %}</p>
+
+              <p>
+              <small class="text-muted" style="float: left;">
+
+                <!--Post Like-->
+                {%if request.user.is_authenticated%}
+                {% if request.user in object.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+                {% endif %}          
+                <a href="{% url 'share_post' pk=object.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a>
+                {% if request.user in object.saved.all %}
+                <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
+                </a>
+                {% else %}
+                <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
+                </a>
+                {% endif %}      
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
+                {%endif%}
+              </small>
+              </p>
           </div>
         </article>
       {% else %}
@@ -53,7 +91,6 @@
             <h4>No Posts Found Having Search Query "{{ request.GET.q }}"</h4>
           </div>
 {% endfor %}
-    <!--http://127.0.0.1:8000/search/?q=lekan&page=4-->
     <!--Pagination Begin-->
     {% if is_paginated %}
       {% if page_obj.has_previous %}
