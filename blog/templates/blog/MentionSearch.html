@@ -45,9 +45,13 @@
               <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small>
             </div>
             <h5><a class="article-title" href="{% url 'post-detail' post.pk%}">{{ post.title }}</a>
-            {% if post.images_set.count >= 1 %}
-              <span class="badge badge-secondary ml-2">IMG</span>
-                  {% endif %}</h5>
+            {% if post.video  %}
+              <span class="badge badge-secondary ml-2"><small>VID</small></span>
+                  {% endif %}
+                  {% if post.audio  %}
+              <span class="badge badge-secondary ml-2"><small>AUD</small></span>
+                  {% endif %}
+            </h5>
             <p class="article-content">{{ post.content|truncatewords:"50"|hashtag_links|mention_link }}
             
               {% ifnotequal post.content|truncatewords:"50"|length post.content|truncatewords:"51"|length %}
