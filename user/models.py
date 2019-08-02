@@ -20,6 +20,18 @@ class ProfileManager(models.Manager):
             qs = qs.filter(or_lookup).distinct() # distinct() is often necessary with Q lookups
         return qs
 
+class AdminUpload(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f'{self.user.username}'
+
+class AdminImages(models.Model):
+    admin = models.ForeignKey(AdminUpload, on_delete=models.CASCADE)
+    image = models.FileField(upload_to='website_img/', blank=True, null=True)
+
+    def __str__(self):
+        return f'{self.admin}'
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)

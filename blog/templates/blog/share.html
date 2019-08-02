@@ -15,7 +15,7 @@
               <a class="mr-2" href="{% url 'user-posts' post.user.username %}">@{{ post.user }}</a>
               <small class="text-muted">{{ post.date_posted|date:"F d, Y" }} </small>
             </div>
-            <h5><a class="article-title" href="">{{ post.title }}</a>
+            <h5><a class="article-title" href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
                 {% if post.image or post.image_3 or post.image_2 %}
               <span class="badge badge-secondary ml-2">IMG</span>
                   {% endif %}</h5>

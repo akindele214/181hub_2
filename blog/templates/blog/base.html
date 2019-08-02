@@ -170,7 +170,7 @@
               {% if user.is_authenticated %}
                 <a class="nav-item nav-link" href="{% url 'post-create' %}">New Post</a>
                 <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
-                <a class="nav-item nav-link" href="{% url 'messenger' %}">Messages</a>
+                {% comment %} <a class="nav-item nav-link" href="{% url 'messenger' %}">Messages</a> {% endcomment %}
                 <a class="nav-item nav-link" href="{% url 'notifications:mark_all_as_read' %}">Notifications({% live_notify_badge %})</a>
               {% else %}
                 <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
@@ -222,7 +222,7 @@
   <article class="media content-section mb-0" style="border: #dddddd">
   <!-- Copyright -->
   <div class="footer-copyright text-center py-3 media-body">© 2018 Copyright:
-    <a href="#"> OpenSource Ni</a>
+    <a href="#"> 181hub</a>
     <p>Disclaimer: Every 181hub member is solely responsible for anything that he/she posts or uploads on 181hub.</p>
   </div>
   <!-- Copyright -->

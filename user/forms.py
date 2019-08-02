@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import Profile, Monetization
+from .models import Profile, Monetization, AdminUpload
 
 
 class UserRegisterForm(UserCreationForm):
@@ -41,3 +41,9 @@ class MonetizeForm(forms.ModelForm):
     class Meta:
         model = Monetization
         fields = ['bank', 'account_name', 'account_num']
+
+class AdminUp(forms.ModelForm):
+
+    class Meta:
+        model = AdminUpload
+        exclude = ['user']

@@ -8,12 +8,29 @@
         </button>
       </div>
       <div class="modal-body">
-
-        <div class="text-center">
-          {% for p in post.images_set.all %}
-          <img src="{{p.image.url}}" class="img-fluid" alt="..." style="width: 100px; height: 100px; object-fit: cover;">
-          {%endfor%}
+      <div class="container col-sm-12 text-center">
+       <div id="carouselExampleControls{{ post.pk }}" class="row justify-content-md-center carousel slide mb-4" data-ride="carousel" data-interval="false">
+      <div class="carousel-inner">
+        {% for p in post.images_set.all %}
+        <div {% if forloop.first %} class="carousel-item active" {% else %} class="carousel-item" {% endif %}>
+            <img src="{{p.image.url}}" class="img-fluid rounded" alt="...">
         </div>
+        
+        {%endfor%}
+      </div>
+      {% if post.images_set.count > 1 %}
+        <a class="carousel-control-prev" href="#carouselExampleControls{{ post.pk }}" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="sr-only">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carouselExampleControls{{ post.pk }}" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+      {%endif%}
+
+      </div>
+      </div>
      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

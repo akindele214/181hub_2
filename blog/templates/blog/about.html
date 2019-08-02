@@ -1,4 +1,89 @@
 {% extends "blog/base.html" %}
 {% block content%}
-    <h1>About Page</h1>
+    <div class="media content-section">
+    <div class="media-body">
+    <span style="font-weight: lighter; border-bottom: 1px solid; font-size: 2.5em;" >About</span>
+    <p>181hub is a social website that lets users share thoughts and content freely. No restrictions what so ever.
+    Users are allowed to create posts with video, audio and images. Any adult and unauthorized use of copyrighted content will be taken down if reported
+    </p>
+    <hr>
+    <span style="font-weight: lighter; border-bottom: 1px solid; font-size: 2.5em;" >How to use 181hub</span>
+    <p class="mt-2">
+    <span style="font-size: 1.3em; margin-top: 9px;">Sigining Up and Loging In: </span>you are allowed to create an account or sign in with Gmail or Facebook if 
+    you wish to sign in with other social website account
+    </p>
+    
+    <div class="bd-example text-center">
+        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+          <ol class="carousel-indicators">
+            <li data-target="#carouselExampleCaptions" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleCaptions" data-slide-to="1"></li>
+          </ol>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="/media/website_img/home_logout_mobile.png" class="img-thumbnail img-fluid" alt="...">
+              <div class="carousel-caption d-none d-md-block">
+                <p>For Mobile Device.</p>
+              </div>
+            </div>
+            <div class="carousel-item">
+              <img src="/media/website_img/home_logout_pc.png" class="img-thumbnail img-fluid" alt="...">
+              <div class="carousel-caption d-none d-md-block">
+                <p>For PC Click on the Log In .</p>
+              </div>
+            </div>
+          </div>
+          <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      </div>
+    <hr>
+    <span style="font-size: 1.3em; margin-top: 9px;">Create Post: </span>logged in users can create posts. When creating a post you can upload upto four pictures, one video(.mp4) and one audio(.mp3)    
+    
+    <div class="bd-example text-center mt-3">
+        <div id="carouselExampleCaptions2" class="carousel slide" data-ride="carousel">
+          <ol class="carousel-indicators">
+            <li data-target="#carouselExampleCaptions2" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleCaptions2" data-slide-to="1"></li>
+          </ol>
+          <div class="carousel-inner">
+            <div class="carousel-item active">
+              <img src="/media/website_img/create_pc.png" class="img-fluid img-thumbnail" alt="...">
+            </div>
+            <div class="carousel-item">
+              <img src="/media/website_img/create_mobile.png" class="img-fluid img-thumbnail" alt="...">
+            </div>
+          </div>
+          <a class="carousel-control-prev" href="#carouselExampleCaptions2" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+          </a>
+          <a class="carousel-control-next" href="#carouselExampleCaptions2" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+          </a>
+        </div>
+      </div>
+
+    <img class="text-center img-fluid img-thumbnail mt-5 mb-3" src="/media/website_img/create_post.png">
+     <hr>
+    <span style="font-size: 1.3em; margin-top: 9px;">Like Post: </span>logged in users can like a post by taping the <i class="far fa-heart fa-lg"> </i>  icon
+    <hr>
+    <span style="font-size: 1.3em; margin-top: 9px;">Share Post: </span>logged in users can share a post with their followers by taping the <i class="fa fa-exchange-alt fa-lg"> </i>  icon
+    <hr>
+    <span style="font-size: 1.3em; margin-top: 9px;">Save Post: </span>logged in users can save a post by taping the <i class="far fa-bookmark fa-lg"> </i>  icon
+    <hr>
+    <span style="font-size: 1.3em; margin-top: 9px;">Mentions: </span>a post containing another account's username, preceded by "@" symbol. For example: "Hello @jago", In the recipient's notification tab, the mention will appear in the recipient's Home if they are following the sender
+    <hr>
+    <span style="font-size: 1.3em; margin-top: 9px;">Hashtags: </span>logged in users can use the hashtag symbol(#) before a relevant keyword or phrase in their post. Clicking or tapping on a hashtagged word in any message shows you other posts with similar hashtag
+    </div>
+        
+    <br>
+    </div>
 {% endblock content %}

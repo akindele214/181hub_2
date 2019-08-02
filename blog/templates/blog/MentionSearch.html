@@ -48,7 +48,70 @@
             {% if post.images_set.count >= 1 %}
               <span class="badge badge-secondary ml-2">IMG</span>
                   {% endif %}</h5>
-            <p class="article-content">{{ post.content|truncatewords:"19"|hashtag_links|mention_link }}</p>
+            <p class="article-content">{{ post.content|truncatewords:"50"|hashtag_links|mention_link }}
+            
+              {% ifnotequal post.content|truncatewords:"50"|length post.content|truncatewords:"51"|length %}
+              <a href="{% url 'post-detail' post.pk %}" class="mt-0" >read more</a>
+              {% endifnotequal %}
+
+              <!--First Modal-->
+              {%if post.images_set.count >= 1%}
+              <div class="text-center mb-3" style="position: relative;">
+                  {%for p in post.images_set.all %}
+                    {% if forloop.first %}
+                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;">{{post.images_set.count}}</span>
+                      <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
+                      data-toggle="modal" data-target="#exampleModalCenter{{ post.pk }}"
+                      >
+                    {%endif%}
+                  {%endfor%}
+
+                  <!--Modal-->
+                  <div class="modal fade" id="exampleModalCenter{{ post.pk }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">{{ post.title }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                      <div class="container col-sm-12 text-center">
+                      <div id="carouselExampleControls{{ post.pk }}" class="row justify-content-md-center carousel slide mb-4" data-ride="carousel" data-interval="false">
+                      <div class="carousel-inner">
+                        {% for p in post.images_set.all %}
+                        <div {% if forloop.first %} class="carousel-item active" {% else %} class="carousel-item" {% endif %}>
+                            <img src="{{p.image.url}}" class="img-fluid rounded" alt="...">
+                        </div>
+                        
+                        {%endfor%}
+                      </div>
+                      {% if post.images_set.count > 1 %}
+                        <a class="carousel-control-prev" href="#carouselExampleControls{{ post.pk }}" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                      </a>
+                      <a class="carousel-control-next" href="#carouselExampleControls{{ post.pk }}sh" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                      </a>
+                      {%endif%}
+
+                      </div>
+                      </div>
+                    </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {%endif%}
+              <!--Modal End-->
+
+            </p>
           </div>
         </article>
     {% endfor %} 

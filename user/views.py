@@ -8,7 +8,12 @@ from .models import Profile, Monetization
 from django.contrib.auth.models import User
 from blog.models import Post
 from django.contrib.auth.decorators import user_passes_test
+from django.forms import modelformset_factory
 
+from .models import AdminImages
+from .forms import AdminUp
+from django.views.generic import View
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 # Create your views here.
 
 
@@ -166,3 +171,45 @@ def live_counter(request):
         return render(request, 'user/live_counter.html', context)
     else:
         raise Http404
+
+class Admin(LoginRequiredMixin, UserPassesTestMixin,View):
+    model = AdminUp
+
+    def get(self, request):
+        form = AdminUp()
+        ImageFormset = modelformset_factory(AdminImages, fields=('image',), extra=4)
+        formset = ImageFormset(queryset=AdminImages.objects.none())
+        context = {
+            'form': form,
+            'formset': formset,
+        }
+        return render(request, 'blog/post_form.html', context)
+
+    def post(self, request):
+        ImageFormset = modelformset_factory(AdminImages, fields=('image',), extra=4)
+        if request.method == 'POST':
+            form = AdminUp(request.POST, request.FILES or None)
+            formset = ImageFormset(request.POST or None, request.FILES or None)
+            if form.is_valid() and formset.is_valid():
+                post = form.save(commit=False)
+                post.user = request.user
+                post.save()
+                for f in formset:
+                    try:
+                        photo = AdminImages(admin=post, image=f.cleaned_data['image'])
+                        photo.save()
+                    except Exception as e:
+                        break
+                return redirect('blog-home')
+        else:
+            form = AdminUp()
+            formset = ImageFormset(queryset=Images.objects.none())
+
+        context = {
+            'form': form,
+            'formset': formset, 
+        }
+        return render(request, 'blog/post_form.html', context)
+
+    def test_func(self):
+        return self.request.user.is_superuser

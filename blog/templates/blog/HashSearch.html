@@ -23,10 +23,98 @@
               {% include 'blog/modal.html'%}
                   {% endif %}
                   {% if post.post.video  %}
-              <span class="badge badge-secondary ml-2">VID</span>
-              <button type="button" class="btn btn-secondary btn-sm">VID</button>
+              <span class="badge badge-secondary ml-2"><small>VID</small></span>
+                  {% endif %}
+                  {% if post.post.audio  %}
+              <span class="badge badge-secondary ml-2"><small>AUD</small></span>
                   {% endif %}</h5>
-              <p class="article-content">{{ post.post.content|truncatewords:"19"|hashtag_links|mention_link|urlize}}</p>
+              <p class="article-content" style="white-space: normal;">{{ post.post.content|truncatewords:"30"|hashtag_links|mention_link|urlize}}
+              {% ifnotequal post.post.content|truncatewords:"30"|length post.post.content|truncatewords:"31"|length%}
+              <a href="{%url 'post-detail' post.post.pk %}" class="mt-0">read more</a>
+              {%endifnotequal%}
+              </p>
+                <!--First Modal-->
+              {%if post.post.images_set.count >= 1%}
+              <div class="text-center mb-3" style="position: relative;">
+                  {%for p in post.post.images_set.all %}
+                    {% if forloop.first %}
+                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;">{{post.post.images_set.count}}</span>
+                      <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
+                      data-toggle="modal" data-target="#exampleModalCenter{{ post.post.pk }}p"
+                      >
+                    {%endif%}
+                  {%endfor%}
+
+                  <!--Modal-->
+                  <div class="modal fade" id="exampleModalCenter{{ post.post.pk }}p" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">{{ post.post.title }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                      <div class="container col-sm-12 text-center">
+                      <div id="carouselExampleControls{{ post.post.pk }}p" class="row justify-content-md-center carousel slide mb-4" data-ride="carousel" data-interval="false">
+                      <div class="carousel-inner">
+                        {% for p in post.post.images_set.all %}
+                        <div {% if forloop.first %} class="carousel-item active" {% else %} class="carousel-item" {% endif %}>
+                            <img src="{{p.image.url}}" class="img-fluid rounded" alt="...">
+                        </div>
+                        
+                        {%endfor%}
+                      </div>
+                      {% if post.post.images_set.count > 1 %}
+                        <a class="carousel-control-prev" href="#carouselExampleControls{{ post.post.pk }}p" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                      </a>
+                      <a class="carousel-control-next" href="#carouselExampleControls{{ post.post.pk }}p" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                      </a>
+                      {%endif%}
+
+                      </div>
+                      </div>
+                    </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {%endif%}
+              <!--Modal End-->
+
+              <p>
+              <small class="text-muted" style="float: left;">
+
+                <!--Post Like-->
+                {%if request.user.is_authenticated%}
+                {% if request.user in post.post.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.post.get_api_like_url}}" data-likes="{{post.post.likes.count}}" href="{{ post.post.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.post.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.post.get_api_like_url}}" data-likes="{{post.post.likes.count}}" href="{{ post.post.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.post.likes.count}}</a>
+                {% endif %}          
+                <a href="{% url 'share_post' pk=post.post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a>
+                {% if request.user in post.post.saved.all %}
+                <a class="save-btn" href="{{post.post.get_save_url}}" data-href="{{post.post.get_api_save_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
+                </a>
+                {% else %}
+                <a class="save-btn" href="{{post.post.get_save_url}}" data-href="{{post.post.get_api_save_url}}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
+                </a>
+                {% endif %}      
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
+                {%endif%}
+              </small>
+              </p>
           </div>
         </article>
       {% elif class == 'ShareTag' %}
@@ -35,6 +123,7 @@
             <div class="article-metadata">
               <img src="{{ post.share.post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
               <a class="mr-2" href="{% url 'user-posts'  post.share.post.user.username %}">{{post.share.post.user }}  {% if post.share.post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <small class="text-muted">{{ post.share.post.date_posted|timesince|upto:','  }} ago</small>
             </div>
             <h5><a class="article-title" href="{% url 'post-detail' post.share.post.pk %}">{{ post.share.post.title }}</a>
                 {% if post.share.post.images_set.count >= 1 %}
@@ -42,21 +131,149 @@
               {% include 'blog/modal.html'%}
                   {% endif %}
                 {% if post.share.post.video %}
-              <span class="badge badge-secondary ml-2">VID</span>
+              <span class="badge badge-secondary ml-2"><small>VID</small></span>
+                  {% endif %}
+                {% if post.share.post.audio %}
+              <span class="badge badge-secondary ml-2"><small>AUD</small></span>
                   {% endif %}</h5>
-              <p class="article-content">{{ post.share.post.content|truncatewords:"19"|hashtag_links|mention_link|urlize }}</p>
-              <p>
-                <small class="text-muted">{{ post.share.post.date_posted|timesince|upto:','  }} ago</small>
+              <p class="article-content" style="white-space:normal;">{{ post.share.post.content|truncatewords:"30"|hashtag_links|mention_link|urlize }}
+              {% ifnotequal post.share.post.content|truncatewords:"30"|length post.share.post.content|truncatewords:"31"|length%}
+              <a href="{%url 'post-detail' post.share.post.pk %}" class="mt-0">read more</a>
+              {%endifnotequal%}
               </p>
-              <div class="article-metadata"></div>
+
+                    <!--First Modal-->
+              {%if post.share.post.images_set.count >= 1%}
+              <div class="text-center mb-3" style="position: relative;">
+                  {%for p in post.share.post.images_set.all %}
+                    {% if forloop.first %}
+                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;">{{post.share.post.images_set.count}}</span>
+                      <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
+                      data-toggle="modal" data-target="#exampleModalCenter{{ post.share.post.pk }}sh"
+                      >
+                    {%endif%}
+                  {%endfor%}
+
+                  <!--Modal-->
+                  <div class="modal fade" id="exampleModalCenter{{ post.share.post.pk }}sh" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">{{ post.share.post.title }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                      <div class="container col-sm-12 text-center">
+                      <div id="carouselExampleControls{{ post.share.post.pk }}sh" class="row justify-content-md-center carousel slide mb-4" data-ride="carousel" data-interval="false">
+                      <div class="carousel-inner">
+                        {% for p in post.share.post.images_set.all %}
+                        <div {% if forloop.first %} class="carousel-item active" {% else %} class="carousel-item" {% endif %}>
+                            <img src="{{p.image.url}}" class="img-fluid rounded" alt="...">
+                        </div>
+                        
+                        {%endfor%}
+                      </div>
+                      {% if post.share.post.images_set.count > 1 %}
+                        <a class="carousel-control-prev" href="#carouselExampleControls{{ post.share.post.pk }}sh" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                      </a>
+                      <a class="carousel-control-next" href="#carouselExampleControls{{ post.share.post.pk }}sh" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                      </a>
+                      {%endif%}
+
+                      </div>
+                      </div>
+                    </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {%endif%}
+              <!--Modal End-->
+
+              <p>
+              <small class="text-muted" style="float: left;">
+
+                <!--Post Like-->
+                {%if request.user.is_authenticated%}
+                {% if request.user in post.share.post.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.share.post.get_api_like_url}}" data-likes="{{post.share.post.likes.count}}" href="{{ post.share.post.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.share.post.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.share.post.get_api_like_url}}" data-likes="{{post.share.post.likes.count}}" href="{{ post.share.post.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.share.post.likes.count}}</a>
+                {% endif %}          
+                <a href="{% url 'share_post' pk=post.share.post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a>
+                {% if request.user in post.share.post.saved.all %}
+                <a class="save-btn" href="{{post.share.post.get_save_url}}" data-href="{{post.share.post.get_api_save_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
+                </a>
+                {% else %}
+                <a class="save-btn" href="{{post.share.post.get_save_url}}" data-href="{{post.share.post.get_api_save_url}}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
+                </a>
+                {% endif %}      
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
+                {%endif%}
+              </small>
+               
+              </p>
+              <br>
               
-              <article class="article-metadata-share">
+              <div class="article-metadata mt-2"></div>
+              
+              <article class="article-metadata-share mt-2">
               <img src="{{ post.share.user.profile.image.url }}" class="rounded-circle article-img mb-1">
               Repost by
               <a class="mr-2" href="{% url 'user-posts' post.share.user.username %}"> {{ post.share.user }}  {% if post.share.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
-              <p class="article-content">{{ post.share.content|hashtag_links|mention_link|urlize }}</p>
-              <p>
-              <small class="text-muted">{{ post.share.date_posted|timesince|upto:','  }} ago</small></p>
+                       
+              {%if post.share.is_quote%}
+               <article class="media content-section infinite-item mt-3">
+                <div class="media-body">
+                  <div class="article-metadata">
+                    <img src="{{ post.share.share_post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+                    <a class="mr-2" href="{% url 'user-posts' post.share.share_post.user.username %}">{{ post.share.share_post.user.username }} {% if post.share.share_post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+                    <small class="text-muted">{{ post.share.share_post.date_posted|date:"F d, Y" }} </small>
+                  </div>
+                    <p class="article-content">{{ post.share.share_post.content|hashtag_links|mention_link|urlize }}</p>
+                </div>
+
+              </article>
+              {% endif%}
+              <p class="article-content" style="white-space: normal;">{{ post.share.content|hashtag_links|mention_link|urlize }}
+              {% if post.share.image %}
+                <div class="container col-sm-12 text-center mb-2">
+                  <img src="{{post.share.image.url}}" alt="..." class="img-thumbnail">
+                </div>
+              {% endif %}
+              </p>
+               <p>
+              
+                <small class="text-muted">
+
+                <!--Share Like-->
+                {%if request.user.is_authenticated%}
+                {% if request.user in post.share.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.share.get_api_like_url}}" data-likes="{{post.share.likes.count}}" href="{{ post.share.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.share.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.share.get_api_like_url}}" data-likes="{{post.share.likes.count}}" href="{{ post.share.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.share.likes.count}}</a>
+                {% endif %}
+                <a href="{% url 'quote-share' post.share.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a>
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
+                {%endif%}
+              </small>
+              <small class="text-muted" style="float: right;">{{ post.share.date_posted|timesince|upto:','  }} ago</small></p>
+              
               </article>
               <p style="text-align: center;"><a href="{% url 'share-thread' post.share.post.pk %}" style="text-decoration: none; color: black;">View Thread</a></p>
           </div>

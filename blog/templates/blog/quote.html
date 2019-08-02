@@ -14,7 +14,7 @@
               <a class="mr-2" href="{% url 'user-posts' share_post.user.username %}">@{{ share_post.user }}</a>
               <small class="text-muted">{{ share_post.date_posted|date:"F d, Y" }} </small>
             </div>
-              <p class="article-content">{{ share_post.content|truncatewords:"25"|urlize  }}</p>
+              <p class="article-content">{{ share_post.content|truncatewords:"30"|urlize }}</p>
           </div>
         </article>
 

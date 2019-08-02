@@ -639,14 +639,14 @@ class UserPostListView(ListView):
         user = get_object_or_404(User, username=username)
         profile_user_id = get_object_or_404(User, username=username).profile
         profile = User.objects.get(username=username).profile
-        posts = Post.objects.filter(user=user).order_by('date_posted')
+        posts = Post.objects.filter(user=user).order_by('-date_posted')
         # self.object_list = Post.objects.filter(user=user).order_by('-date_posted')
         is_user = False
         is_follow = False
         bio_length = len(user.profile.content)
 
 
-        post = Post.objects.filter(user=user).order_by('date_posted')
+        post = Post.objects.filter(user=user).order_by('-date_posted')
         page = request.GET.get('page', 1)
         paginator = Paginator(post, 30)
         try:
