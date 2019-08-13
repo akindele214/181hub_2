@@ -1,6 +1,22 @@
-from .models import Comment, Post, Share, Images, Quote, Report
+from .models import Comment, Post, Share, Images, Quote, Report , WebGroup, GroupPost
 from django.contrib.auth.models import User
 from django import forms
+
+
+class GroupCreateForm(forms.ModelForm):
+    group_name = forms.Textarea()
+
+    class Meta:
+        model = WebGroup
+        fields = ('group_name',)
+
+
+class GroupPostCreateForm(forms.ModelForm):
+    content = forms.CharField(label="", widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Talk Your Own', 'rows': '4', 'cols': '30'}))
+    
+    class Meta:
+        model = GroupPost
+        fields = ('content',)
 
 
 class PostCreateForm(forms.ModelForm):
@@ -49,6 +65,7 @@ class SearchForm(forms.ModelForm):
         fields = ('search',)
 
 
+
 class ShareForm(forms.ModelForm):
     content = forms.CharField(label="", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Talk Your Own', 'rows': '4', 'cols': '30'}))
 
@@ -59,6 +76,7 @@ class ShareForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ShareForm, self).__init__(*args, **kwargs)
         self.fields['content'].required = False
+
 
 class QuoteForm(forms.ModelForm):
     content = forms.CharField(label="", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Talk Your Own', 'rows': '4', 'cols': '30'}))
@@ -71,10 +89,12 @@ class QuoteForm(forms.ModelForm):
         super(QuoteForm, self).__init__(*args, **kwargs)
         self.fields['content'].required = False
 
+
 class ShareEditForm(forms.ModelForm):
     class Meta:
         model = Share
         fields = ['content', 'image']
+
 
 class ReportForm(forms.ModelForm):
     content = forms.CharField(label="", required=True, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Report Goes Here', 'rows': '4', 'cols': '30'}))

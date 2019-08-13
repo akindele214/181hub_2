@@ -3,7 +3,7 @@
 {% block title %}Profile - {{block.super}}{%endblock%}
 {% block content %}
     <div class="content-section">
-        {% if is_cash %}
+        {% if money >= 200 %}
     <form method="POST">
             {% csrf_token %}
             <fieldset class="form-group">
@@ -19,7 +19,7 @@
             </div>
     </form>
     {% else %}
-    <button class="btn btn-outline-info"><small>Money Lowo Lowo Has To Be Above 1000 To Cash Out</small></button>
+    <button class="btn btn-outline-info"><small>Money Lowo Lowo Has To Be Above 500 To Cash Out</small></button>
     {% endif %}
 </div>
 {% endblock content %}

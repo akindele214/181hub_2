@@ -4,14 +4,14 @@ from urllib.parse import urlencode
 from django.contrib import messages
 from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect, reverse
-from .models import Post, Comment, Share, Images, HashTag, ShareTag, Quote, Report
+from .models import Post, Comment, Share, Images, HashTag, ShareTag, Quote, Report, WebGroup, GroupPost
 from django.views.generic import ListView, View, CreateView, UpdateView, DeleteView, RedirectView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseRedirect, Http404  # HttpResponse, Http404
 from django.db.models import Q
 from django.template.loader import render_to_string
-from .forms import CommentForm, ShareForm, PostCreateForm, PostEditForm, ShareEditForm, QuoteForm, ReportForm
+from .forms import CommentForm, ShareForm, PostCreateForm, PostEditForm, ShareEditForm, QuoteForm, ReportForm, GroupCreateForm, GroupPostCreateForm
 from itertools import chain
 from user.models import Profile
 from notifications.signals import notify
@@ -74,6 +74,7 @@ class PostListView(ListView):
         posts = []
         shared_post = []
         hash_post = []
+        user_final_hashtag = []
         final_hash_post = []
         final_post = []
         if self.request.user.is_authenticated:
@@ -84,7 +85,20 @@ class PostListView(ListView):
             date = timedelta(days=7)
             last_week = timezone.now() - date
             all_tag = HashTag.objects.filter(date_posted__gt=last_week).exclude(user=self.request.user).values_list('post', flat=True).distinct()
+            # users_hashtag = HashTag.objects.filter(date_posted__gt=last_week, user__exact=self.request.user)
+            users_hashtag = HashTag.objects.filter(date_posted__gt=last_week, user__exact=self.request.user).values_list('tag', flat=True).distinct()
+            print(users_hashtag)
 
+
+            for hashtag in users_hashtag:
+                for final_hashtag in HashTag.objects.filter(date_posted__gt=last_week, tag__iexact=hashtag).exclude(user=self.request.user).values_list('post', flat=True).distinct():
+                    hash_post.append(final_hashtag)
+            print(hash_post)
+            
+            for final_hashtag_post in hash_post:
+                final_ = Post.objects.get(pk=final_hashtag_post)
+                user_final_hashtag.append(final_)
+            print(user_final_hashtag) 
             for postx in all_tag:
                 post_post = Post.objects.get(pk=postx)
                 final_post.append(post_post)
@@ -97,7 +111,7 @@ class PostListView(ListView):
                 for share in Share.objects.filter(user__exact=profile.user):
                     shared_post.append(share)
 
-            for f_post in final_post:
+            for f_post in user_final_hashtag:
                 if f_post.user.profile not in user_profile.follower.all():
                     final_hash_post.append(f_post)
             # logged_in_user_shared_post = Share.objects.filter(post__user=self.request.user)
@@ -166,7 +180,7 @@ class HashSearchView(ListView):
     paginate_by = 30
     context_object_name = 'posts'
     template_name = 'blog/HashSearch.html'
-    count = 0
+    # count = 0
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -189,6 +203,7 @@ class HashSearchView(ListView):
             qs = sorted(queryset_chain, key=lambda instance: instance.date_posted,
                         reverse=True)
             self.count = len(qs)
+            print(self.count)
             return qs
         else:
             HashTag.objects.none()
@@ -630,7 +645,6 @@ class ShareLikeToggle(LoginRequiredMixin, RedirectView):
         return url_
 
 
-
 class UserPostListView(ListView):
     model = Post
 
@@ -824,7 +838,7 @@ class PostCreateView(LoginRequiredMixin, CreateView):
 class CreatePostView(LoginRequiredMixin, View):
     model = Post
     # fields = ['title', 'content', 'restrict_comment']
-    template_name = 'post_form.html'
+    # template_name = 'post_form.html'
 
     def get(self, request):
         form = PostCreateForm()
@@ -1370,12 +1384,149 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return HttpResponseRedirect(success_url)
 
 
+
+class GroupCreate(LoginRequiredMixin, View):
+    model = WebGroup
+
+    def get(self, request):
+        form = GroupCreateForm()
+        context = {
+            'form': form
+        }
+        return render(request, 'blog/group_create.html', context)
+
+    def post(self, request):
+        if request.method == 'POST':
+            form = GroupCreateForm(request.POST)
+            if form.is_valid():
+                post = form.save(commit=False)
+                post.first_member = request.user
+                post.save()
+                post.group_members.add(request.user)
+                post.save()
+                return redirect('blog-home')
+        
+        else:
+            form = GroupCreateForm()
+           
+        context = {
+            'form': form,
+        }
+        return render(request, 'blog/group_create.html', context)
+
+
+class GroupPostCreate(LoginRequiredMixin, UserPassesTestMixin, View):
+    model = GroupPost
+    paginate_by = 30
+
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        group = WebGroup.objects.get(id=pk)
+        post = GroupPost.objects.filter(group=group).order_by('date_posted')
+
+        form = GroupPostCreateForm()
+        context = {
+            'form':form,
+            'posts': post
+        }
+        return render(request, 'blog/group_post.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        group = get_object_or_404(WebGroup, pk=pk)
+        if request.method == 'POST':
+            form = GroupPostCreateForm(request.POST, request.FILES or None)
+            if form.is_valid():
+                # post = form.save(commit=False)
+                # post.user = request.user
+                # words = form.cleaned_data['content']
+                # post.save()
+
+                # image = share_form.cleaned_data['image']  # request.POST.get('image')
+                content = form.cleaned_data['content']
+                share_create = GroupPost.objects.create(group=group, user=request.user, content=content)
+                share_create.save()
+                messages.success(request, f'Done')
+                return redirect('group-thread', pk=pk)
+        else:
+            pk = kwargs['pk']
+            group = WebGroup.objects.get(id=pk)
+            post = GroupPost.objects.filter(group=group).order_by('date_posted')
+
+            form = GroupPostCreateForm()
+            
+        context = {
+            'form': form,
+        }
+        return render(request, 'blog/group_post.html', context)
+    
+    def test_func(self):
+        pk = self.kwargs.get('pk')
+        group = WebGroup.objects.get(pk=pk)
+        if self.request.user in group.group_members.all():
+            return True
+        return False
+
+
+class GroupLikeToggle(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        print(pk)
+        obj = get_object_or_404(GroupPost, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.add(user)
+        return url_
+
+class GroupLikeAPIToggle(APIView):
+    
+    """
+    View to list all users in the system.
+
+    * Requires token authentication.
+    * Only authenticated users are able to access this view.
+    """
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk=None, format=None):
+        # pk = self.kwargs.get('pk')
+        obj = get_object_or_404(GroupPost, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        updated = False
+        liked = False
+
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+                liked = False
+            else:
+                obj.likes.add(user)
+                liked = True
+                if request.user != obj.user:
+                    notify.send(request.user, recipient=obj.user, verb='liked your post in a group', action_object=obj,description=obj.content)
+            updated = True
+        data = {
+            "updated": updated,
+            "liked": liked,
+            "like_count": obj.likes.count()
+        }
+        return Response(data)
+
+
 def trending(request):
     post = Post.objects.filter(hit_count_generic__gt=105)
     context ={
         'post':post
     }
     return render(request, 'blog/treding.html', context)
+
 
 def about(request):
     return render(request, 'blog/about.html', {'title': 'About'})

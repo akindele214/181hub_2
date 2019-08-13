@@ -18,19 +18,18 @@
                 <p>Total View{{total_views|pluralize}}: {{total_views}}</p>
                 <p>Monetized Views: {{monetized_views}}</p> 
                 <p>Money Lowo Lowo: ₦{{money}}</p> 
-                {% if is_cash %}
+                {% if money >= 500 %}
                 <form method="GET" action="{% url 'monetize' %}">
                 <button class="btn btn-outline-info">Cash Out</button>
                 </form>
                 {% else %}
-                <button class="btn btn-outline-info"><small>Money Lowo Lowo Has To Be Above 1000 To Cash Out</small></button>
+                <button class="btn btn-outline-info"><small>Money Lowo Lowo Has To Be Above 500 To Cash Out</small></button>
                 {%endif%}
             </fieldset>
             
 </div>
 {% for order in orders %}
 <article class="content-section">
-          <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">-->
           <div class="media-body">
             <div class="article-metadata">
               <img src="{{ order.user.profile.image.url }}" class="rounded-circle article-img">

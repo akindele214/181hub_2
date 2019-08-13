@@ -24,8 +24,10 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'blog/favicon/favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'blog/favicon/site.webmanifest' %}">
 
+    {%if request.user.is_authenticated%}
     <script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
     {% register_notify_callbacks callbacks='fill_notification_list,fill_notification_badge' %}
+    {%endif%}
     
     <title>{% block title %}Localhost{% endblock %}</title>
     <script src="{% static 'blog/jquery.waypoints.min.js' %}"></script>
@@ -156,6 +158,15 @@
           <a class="navbar-brand" href="{% url 'blog-home' %}">181hub</a>
           <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
+          {%if request.user.is_authenticated %}
+          {% live_notify_badge as count %}
+          
+          {% if count %}
+          <span class="badge bage-light" style="color: #fafafa;">{{count}}
+          </span>
+          {%endif%}
+          {%endif%}
+
           </button>
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
@@ -170,7 +181,8 @@
               {% if user.is_authenticated %}
                 <a class="nav-item nav-link" href="{% url 'post-create' %}">New Post</a>
                 <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
-                {% comment %} <a class="nav-item nav-link" href="{% url 'messenger' %}">Messages</a> {% endcomment %}
+                <a class="nav-item nav-link" href="{% url 'messenger' %}">Messages</a> 
+                
                 <a class="nav-item nav-link" href="{% url 'notifications:mark_all_as_read' %}">Notifications({% live_notify_badge %})</a>
               {% else %}
                 <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>

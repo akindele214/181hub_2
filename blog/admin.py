@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Post, Comment, Share, Report, HashTag, ShareTag
+from .models import Post, Comment, Share, Report, HashTag, ShareTag, WebGroup, GroupPost
 
 # Register your models here.
 
@@ -9,6 +9,11 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'title')
     date_hierarchy = ('date_posted')
 
+class WebGroupAdmin(admin.ModelAdmin):
+    list_display = ('id', 'group_name', 'first_member')
+
+class GroupPostAdmin(admin.ModelAdmin):
+    list_display = ('user', 'group', 'share_post')
 
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('post', 'user', 'timestamp')
@@ -32,3 +37,5 @@ admin.site.register(Comment, CommentAdmin)
 admin.site.register(Share, ShareAdmin)
 admin.site.register(ShareTag, ShareTagAdmin)
 admin.site.register(Report, ReportAdmin)
+admin.site.register(WebGroup, WebGroupAdmin)
+admin.site.register(GroupPost, GroupPostAdmin)

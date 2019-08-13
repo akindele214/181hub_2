@@ -143,10 +143,10 @@ jQuery(document).ready(function($) {
             <i class="fas fa-exchange-alt ml-2 fa-lg"></i></a>      
 
             {% if is_saved %}
-            <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-2 mt-2" id="save"></i>
+            <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
             </a>
             {% else %}
-            <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-2 mt-2" id="save" ></i>
+            <a class="save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" data-toggle="tooltip" title="Save Post" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
             </a>
             {% endif %}
             {%else%}

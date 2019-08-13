@@ -152,3 +152,40 @@ class Report(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(str(self.user.username), self.date_submited)
+
+
+class WebGroup(models.Model):
+    group_name = models.CharField(max_length=140,validators=[validate_is_profane])
+    first_member = models.ForeignKey(User, related_name='first_member', on_delete=models.CASCADE)
+    admin = models.ManyToManyField(User, related_name='admin_users', blank=False)
+    group_members = models.ManyToManyField(User, related_name='members', blank=False)
+    date_updated = models.DateTimeField(default=timezone.now)
+    date_created = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return '{} - {}'.format(self.group_name, self.first_member)
+
+class GroupPost(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(WebGroup, on_delete=models.CASCADE)
+    content = models.TextField()
+    share_post = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name='group_post_likes', blank=True)
+    is_quote = models.BooleanField(default=False)
+    date_posted = models.DateTimeField(default=timezone.now)
+    seen_by = models.ManyToManyField(User, blank=True, related_name='seen')
+
+    def __str__(self):
+        return '{} - {}'.format(self.group, self.user)
+
+    def total_likes(self):
+        return self.likes.count()
+
+    def get_absolute_url(self):
+        return reverse('group-thread', kwargs={'pk': self.post.pk})
+
+    def get_like_url(self):
+        return reverse("group-like-toggle",kwargs={'pk': self.pk})
+    
+    def get_api_like_url(self):
+        return reverse("group-like-api-toggle",kwargs={'pk': self.pk})

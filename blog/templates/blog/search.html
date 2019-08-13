@@ -3,7 +3,7 @@
 {% block content %}
 
 <div class='media content-section'>
-    <h4>{{ count }} results for <b>{{ query }}</b></h4>
+    <h4>{{ object_list|length }} results for <b>{{ query }}</b></h4>
 </div>
         
         
@@ -32,10 +32,7 @@
               <small class="text-muted">{{ object.date_posted|date:"F d, Y" }}</small>
             </div>
             <h5><a class="article-title" href="{% url 'post-detail' object.pk %}">{{ object.title }}</a>
-                {% if object.images_set.count >= 1 %}
-              <span class="badge badge-secondary ml-2" data-toggle="modal" data-target="#exampleModalCenter{{ object.pk }}"><small>IMG</small></span>
-                  {% include 'blog/modal.html'%}
-                  {% endif %}
+                
                   {% if object.video  %}
               <span class="badge badge-secondary ml-2"><small>VID</small></span>
                   {% endif %}
@@ -54,7 +51,7 @@
               <div class="text-center mb-3" style="position: relative;">
                   {%for p in object.images_set.all %}
                     {% if forloop.first %}
-                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;">{{object.images_set.count}}</span>
+                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fas fa-camera"></i> {{object.images_set.count}}</span>
                       <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
                       data-toggle="modal" data-target="#exampleModalCenter{{ object.pk }}sh"
                       >

@@ -33,7 +33,11 @@ from .views import (PostListView,
                     SavePostToggle,
                     PostLikeToggle,
                     PostLikeAPIToggle,
-                    Trending)
+                    Trending,
+                    GroupCreate,
+                    GroupPostCreate,
+                    GroupLikeToggle,
+                    GroupLikeAPIToggle)
 from . import views
 import notifications.urls
 import hitcount.urls
@@ -72,8 +76,13 @@ urlpatterns = [
     
     path('share/<int:pk>/like', ShareLikeToggle.as_view(), name='share-like-toggle'),
     path('api/share/<int:pk>/like', ShareLikeAPIToggle.as_view(), name='share-like-api-toggle'),
-
     path('report/<int:pk>/share/', ShareReport.as_view(), name='report-share'),
+
+    # GROUP
+    path('group/new/', GroupCreate.as_view(), name='create-group'),
+    path('group/<int:pk>/', GroupPostCreate.as_view(), name='group-thread'),
+    path('group/<int:pk>/like/', GroupLikeToggle.as_view(), name='group-like-toggle'),
+    path('api/group/<int:pk>/like/', GroupLikeAPIToggle.as_view(), name='group-like-api-toggle'),
 
     # QUOTE
     path('quote/<int:pk>/', QuoteShare.as_view(), name='quote-share'),

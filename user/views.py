@@ -75,9 +75,9 @@ def monetize(request):
             view_diff = total_view
         else:
             view_diff = total_view - monetized_view
-        if view_diff > 10:
+        if view_diff > 500:
             is_cashable = True
-        convert_to_money = round(view_diff * 0.8, 2)
+        convert_to_money = round(view_diff * 0.6, 2)
 
         if request.method == 'POST':
             if request.user.profile.account_monetized == 0:
@@ -107,7 +107,7 @@ def monetize(request):
                     view_diff = total_view - monetized_view
                     if total_view > view_diff:
                         pro.monetized_views += view_diff
-                        # print()
+                        
                         pro.save()
                         messages.success(request, f'Your Cash-Out Request Submitted!')
                     return redirect('wallet')
@@ -116,6 +116,7 @@ def monetize(request):
 
         context = {
             'form': mon_form,
+            'money': convert_to_money,
             'views': views,
             'monetized_views': monetized_view,
             'is_cash': is_cashable
@@ -131,7 +132,7 @@ def wallet(request):
         views = 0
         monetized_view = Profile.objects.get(user=request.user).monetized_views
         deleted_views = Profile.objects.get(user=request.user).deleted_post_views
-        total_post = Post.objects.filter(user=request.user)
+        total_post = Post.objects.filter(user__exact=request.user)
         orders = Monetization.objects.filter(user=request.user)
         is_cashable = False
         for post in total_post:
@@ -143,10 +144,10 @@ def wallet(request):
         else:
             view_diff = total_view - monetized_view
 
-        if view_diff > 10:
+        if view_diff > 500:
             is_cashable = True
         post_count = Post.objects.filter(user=request.user).count()
-        convert_to_money = round(view_diff * 0.8, 2)
+        convert_to_money = round(view_diff * 0.6, 2)
 
         context = {
             'total_views': total_view,

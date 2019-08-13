@@ -17,7 +17,7 @@
               <span class="badge badge-secondary ml-2"><small>VID</small></span>
                   {% endif %}
                   {% if post.audio  %}
-              <span class="badge badge-secondary ml-2"><small>AUD</small></span>
+               <i class="fas fa-music"></i>
                   {% endif %}</h5>
               <p class="article-content" style="white-space:normal;">{{ post.content|truncatewords:"50"|hashtag_links|mention_link|urlize }}
               
@@ -30,7 +30,7 @@
               <div class="text-center mb-3" style="position: relative;">
                   {%for p in post.images_set.all %}
                     {% if forloop.first %}
-                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;">{{post.images_set.count}}</span>
+                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fas fa-camera"></i> {{post.images_set.count}}</span>
                       <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
                       data-toggle="modal" data-target="#exampleModalCenter{{ post.pk }}"
                       >
@@ -95,7 +95,7 @@
               <div class="text-center mb-3" style="position: relative;">
                   {%for p in post.post.images_set.all %}
                     {% if forloop.first %}
-                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;">{{post.post.images_set.count}}</span>
+                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fas fa-camera"></i> {{post.post.images_set.count}}</span>
                       <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
                       data-toggle="modal" data-target="#exampleModalCenter{{ post.post.pk }}sh"
                       >
