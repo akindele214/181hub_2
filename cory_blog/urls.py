@@ -38,6 +38,8 @@ urlpatterns = [
     path('room/messages/', chat_views.messages, name='messenger'),
     path('reportchat/<int:chat_id>', ChatReport.as_view(), name='report_chat'),
     path('room/delete/<int:chat_id>/', chat_views.delete_chat, name='delete_chat'),
+    path('emailrequest/<int:user_id>/', user_views.useremailrequest, name='email_request'),
+    path('emailrequest/<int:user_id>/<str:uuid>/confirm/', user_views.emailrequestconfirm, name='email_request_confirm'),
 ]
 
 if settings.DEBUG:

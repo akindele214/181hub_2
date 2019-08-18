@@ -4,16 +4,18 @@ from django.http import HttpResponseRedirect, HttpRequest, Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods,require_safe
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, MonetizeForm
-from .models import Profile, Monetization
+from .models import Profile, Monetization, UserEmailRequest
 from django.contrib.auth.models import User
 from blog.models import Post
 from django.contrib.auth.decorators import user_passes_test
 from django.forms import modelformset_factory
-
+from datetime import timedelta
+from django.utils import timezone
 from .models import AdminImages
 from .forms import AdminUp
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.core.mail import EmailMessage,send_mail
 # Create your views here.
 
 
@@ -214,3 +216,47 @@ class Admin(LoginRequiredMixin, UserPassesTestMixin,View):
 
     def test_func(self):
         return self.request.user.is_superuser
+
+@login_required
+def useremailrequest(request, user_id):
+    sender = request.user
+    sender_username = sender.username
+    receiver = User.objects.get(id=user_id)
+    receiver_username = receiver.username
+    request_ = UserEmailRequest.objects.create(sender=sender, receiver=receiver)
+    uiid = str(request_.ref_code)
+    url_ = 'https://181hub.com/emailrequest/' +str(user_id)+'/'+ str(uiid)+ '/confirm/'
+    body = '{} would like to send you an email, if you would like to share your email address with {}, click this link {}, \nWarm Regards, \n181hub Team, \nhttps://181hub.com'.format(sender_username, sender_username, url_)
+    email = send_mail(
+        'Email Request',
+        body,
+        '181hub@gmail.com',
+        [receiver.email],
+        fail_silently=False,
+    )
+    messages.success(request, f'Request Sent')
+    return redirect('blog-home')
+
+@login_required
+def emailrequestconfirm(request, user_id,uuid):
+    receiver = request.user
+    try:
+        if UserEmailRequest.objects.get(ref_code=uuid):
+            get_req = get_object_or_404(UserEmailRequest, ref_code=uuid)            
+            if receiver == get_req.receiver:
+                body = "{} accepted your request, {}'s email address is {}. Regards 181hub".format(receiver.username, receiver.username, receiver.email)
+                email = send_mail(
+                'Email Request Confirmation',
+                body,
+                '181hub@gmail.com',
+                [get_req.receiver.email],
+                fail_silently=False,
+                )
+                messages.success(request, f'Email Sent')
+                return redirect('blog-home')
+            else:
+                messages.warning(request, f'Invalid Request')
+                return redirect('blog-home')
+    except UserEmailRequest.DoesNotExist:
+        messages.warning(request, f'Invalid Request')
+        return redirect('blog-home')

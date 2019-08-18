@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import Profile, Monetization, AdminUpload
 
-
 class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
 
@@ -26,12 +25,14 @@ class UserUpdateForm(forms.ModelForm):
         model = User
         fields = ['username', 'email', 'first_name', 'last_name']
 
-
 class ProfileUpdateForm(forms.ModelForm):
+    YEARS= [x for x in range(1904,2020)]    
     content = forms.CharField(label="Bio",  required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Bio Goes Here', 'rows': '4', 'cols': '30'}))
+    # gender = forms.ChoiceField(choices=GENDER_CHOICES,required=True)
+    birth_date= forms.DateField(label='What is your birth date?', initial="1990-06-21", widget=forms.SelectDateWidget(years=YEARS),required=True)
     class Meta:
         model = Profile
-        fields = ('image', 'content',)
+        fields = ('image', 'content', 'gender', 'birth_date')
 
 
 class MonetizeForm(forms.ModelForm):
