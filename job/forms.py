@@ -62,6 +62,7 @@ class CreateJobForm(forms.ModelForm):
     job_description = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
     method_of_application = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
     send_cv_directly = forms.BooleanField(label="Click if You'd Like Applicants to Send CV Directly")
+    company_email = forms.EmailField(widget=forms.TextInput(attrs={'type': 'email','placeholder': "Enter An Email An Applicant Can Send An Application To."}))
 
     class Meta:
         model = JobOpening
@@ -72,6 +73,7 @@ class CreateJobForm(forms.ModelForm):
             'industry',
             'field',
             'state',
+            'company_email',
             'experience',
             'method_of_application',
             'send_cv_directly',

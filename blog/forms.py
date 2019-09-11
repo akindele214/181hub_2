@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django import forms
 
 
+# 'photo_path': forms.ClearableFileInput(attrs={'multiple': True}),
 class GroupCreateForm(forms.ModelForm):
     group_name = forms.Textarea()
 

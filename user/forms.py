@@ -29,10 +29,11 @@ class ProfileUpdateForm(forms.ModelForm):
     YEARS= [x for x in range(1904,2020)]    
     content = forms.CharField(label="Bio",  required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Bio Goes Here', 'rows': '4', 'cols': '30'}))
     # gender = forms.ChoiceField(choices=GENDER_CHOICES,required=True)
+    cv = forms.FileField(label="Upload Your CV If You Intend On Applying For A Job Through The Website: ", widget=forms.ClearableFileInput(attrs={'accept': ".pdf, .docx"}), required=False)
     birth_date= forms.DateField(label='What is your birth date?', initial="1990-06-21", widget=forms.SelectDateWidget(years=YEARS),required=True)
     class Meta:
         model = Profile
-        fields = ('image', 'content', 'gender', 'birth_date')
+        fields = ('image', 'content', 'gender', 'birth_date', 'cv')
 
 
 class MonetizeForm(forms.ModelForm):

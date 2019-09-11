@@ -143,6 +143,7 @@ class JobOpening(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     job_title = models.CharField(max_length=140)
     job_description = models.TextField()
+    company_email = models.EmailField(max_length=254)
     method_of_application = models.TextField(blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)
     experience = models.CharField(choices=EXPERIENCE_CHOICES, max_length=20)
@@ -155,3 +156,4 @@ class JobOpening(models.Model):
     
     def __str__(self):
         return '{} - {}'.format(self.user, self.job_title)
+        

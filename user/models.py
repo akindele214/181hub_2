@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Q
-# from django.contrib.auth.models import User, AbstractUser
+from django.core.validators import FileExtensionValidator
 from PIL import Image
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -43,7 +43,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=140, blank=True)
     content = models.TextField(max_length=120, blank=True)
-    image = models.ImageField(default='default.jpg', upload_to='profile_pics')
+    image = models.ImageField(default='default.jpg', upload_to='profile_pics/')
     following = models.ManyToManyField('self', related_name='followin', symmetrical=False)
     follower = models.ManyToManyField('self', related_name='followr', symmetrical=False)
     gender = models.CharField(max_length=20, choices=GENDER_CHOICES, blank=True, null=True)
@@ -53,6 +53,7 @@ class Profile(models.Model):
     monetized_views = models.IntegerField(blank=False, null=False, default=0)
     account_monetized = models.BooleanField(default=False)
     verified = models.BooleanField(default=False)
+    cv = models.FileField(upload_to='cvs/', blank=True, null=True, validators=[FileExtensionValidator(["pdf","docx"])])
 
     def __str__(self):
         return f'{self.user.username} Profile'

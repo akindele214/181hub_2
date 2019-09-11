@@ -243,13 +243,13 @@
                 {%endif%}
                 <a href="{% url 'saved' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Saved</li></a>
                 {% endif %}  
-                <a href="{% url 'blog-about' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">About</li></a>
+                <a href="{% url 'new_job' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Jobs</li></a>           
                 {% comment %} <a href="{% url 'trending' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Trending</li></a>  
                 <li class="list-group-item list-group-item-light">Calendars</li> {% endcomment %}
                 {% if request.user.is_authenticated %}
                 <a href="{% url 'logout' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Logout</li></a>
                 {% endif %}
-                 
+                <a href="{% url 'blog-about' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">About</li></a>
               </ul>
             </p>
           </div>
