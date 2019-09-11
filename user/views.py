@@ -16,6 +16,11 @@ from .forms import AdminUp
 from django.views.generic import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import EmailMessage,send_mail
+# REST FRAMEWORK
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import authentication, permissions
+
 # Create your views here.
 
 

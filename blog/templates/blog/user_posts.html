@@ -18,21 +18,21 @@
     {% if request.user.is_authenticated %}
     {% if is_user == False%}
     <p class="mb-3" ><a href="{% url 'message' user.id %}" style="text-decoration: none; color: #428bca;">Message</a></p>
-    <form method="POST" action="{% url 'follower' user.id %}">
-      {%csrf_token%}
+ 
+    
     {% if is_following %}
-    <button type="submit" name="user_id" value="{{user.id}}" class="btn btn-danger" id="follow">Unfollow</button>
+    <a href="{{user.profile.get_follow_url}}" data-href="{{user.profile.get_follow_api_url}}" class="follow-btn btn btn-outline-secondary btn-block">UnFollow</a>
     {% else %}
-    <button type="submit" name="user_id" value="{{user.id}}" class="btn btn-primary" id="follow">Follow</button>
+    <a href="{{user.profile.get_follow_url}}" data-href="{{user.profile.get_follow_api_url}}" class="follow-btn btn btn-outline-secondary btn-block">Follow</a>
     {% endif %}
-    </form>
-    {%endif%}
+       {%endif%}
+    {%else%}
+    <a class="btn btn-outline-secondary btn-block" href="{% url 'login'%}">Log In To Follow {{user}}</a>
     {%endif%}
     </div>
     </article>
     {% for post in post %}
         <article class="media content-section">
-          <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">-->
           <div class="media-body">
             <div class="article-metadata">
               <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img">
@@ -40,14 +40,32 @@
               <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small>
             </div>
             <h5><a class="article-title" href="{% url 'post-detail' post.pk%}">{{ post.title }}</a>
-            {% if post.image or post.image_3 or post.image_2 %}
-              <span class="badge badge-secondary ml-2">IMG</span>
+            {% if post.video  %}
+              <span class="badge badge-secondary ml-2"><small>VID</small></span>
+                  {% endif %}
+                  {% if post.audio  %}
+                  <span class="badge badge-secondary ml-2"><small>AUD</small></span>
                   {% endif %}</h5>
             <p class="article-content" style="white-space:normal;">{{ post.content|truncatewords:"30"|hashtag_links|mention_link|urlize }}
             {% ifnotequal post.content|truncatewords:"30"|length post.content|truncatewords:"31"|length%}
             <a href="{%url 'post-detail' post.pk %}" class="mt-0">read more</a>
             {%endifnotequal%}
             </p>
+
+             {% if post.images_set.count >= 1 %}
+              <div class="text-center mb-3" style="position: relative;">
+                  {%for p in post.images_set.all %}
+                    {% if forloop.first %}
+                      <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fas fa-camera"></i> {{post.images_set.count}}</span>
+                      <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
+                      data-toggle="modal" data-target="#exampleModalCenter{{ post.pk }}"
+                      >
+                    {%endif%}
+                  {%endfor%}
+                  {% include 'blog/modal.html'%}
+              </div>
+              {%endif%}
+              
             <p>
               <small class="text-muted" style="float: left;">
 
@@ -69,7 +87,7 @@
                 </a>
                 {% endif %}      
                 {%else%}
-                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like,save and share post</small></a>
                 {%endif%}
               </small>
               </p>

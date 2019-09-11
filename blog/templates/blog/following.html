@@ -5,7 +5,12 @@
           <!--<img src="{{ post.author.profile.image.url }}" class="rounded-circle article-img">-->
     <div class="media-body">
     <img src="{{ follower.image.url }}" class="rounded-circle article-img">
-    <a class="mr-2" href="{% url 'user-posts' follower.user.username %}">{{ follower.user.username }}</a>
+    <a class="mr-2" style="text-decoration: none;" href="{% url 'user-posts' follower.user.username %}">{{ follower.user.username }}</a>
+    {% if request.user.is_authenticated %}
+    <a style="float: right; text-decoration: none;" href="#" class="ml-2 mt-2">Follow</a>
+    {%else%}
+    <a style="float: right; text-decoration: none;" href="#" class="ml-2 mt-2">log in to follow {{username}}</a>
+    {%endif%}
           </div>
         </article>
         {% empty %}

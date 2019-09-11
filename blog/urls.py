@@ -37,7 +37,9 @@ from .views import (PostListView,
                     GroupCreate,
                     GroupPostCreate,
                     GroupLikeToggle,
-                    GroupLikeAPIToggle)
+                    GroupLikeAPIToggle,
+                    FollowAPIToggle,
+                    FollowToggle)
 from . import views
 import notifications.urls
 import hitcount.urls
@@ -89,8 +91,12 @@ urlpatterns = [
 
     # OTHERS
     path('follower/<int:user_id>/', views.follow, name='follower'),
+    path('api/follow/<int:user_id>/', FollowAPIToggle.as_view(), name='follow_api'),
+    path('follow/<int:user_id>/', FollowToggle.as_view(), name='follow_toggle'),
+
     path('follower_list/<str:username>/', views.view_followers, name='follower_list'),
     path('following_list/<str:username>/', views.view_following, name='following_list'),
+    
     path('notifications/', include(notifications.urls, namespace='notifications'), name='notifications'),
     path('hitcount/', include(hitcount.urls, namespace='hitcount')),
 

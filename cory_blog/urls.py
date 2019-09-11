@@ -18,6 +18,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('live_counter/', user_views.live_counter, name='live_counter'),
     path('', include('blog.urls')),
+    path('jobs/', include('job.urls')),
     path('emoji/', include('emoji.urls')),
     url(r'^accounts/', include('allauth.urls')),
     path('register/', user_views.register, name='register'),

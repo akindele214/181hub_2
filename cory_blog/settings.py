@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     'profanity',
     'emoji',
     'chat',
+    'job',
     'channels',
     # 'notify',
     'rest_framework',

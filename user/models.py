@@ -5,6 +5,8 @@ from PIL import Image
 from django.contrib.auth.models import User
 from django.utils import timezone
 import uuid
+from django.urls import reverse
+from django.shortcuts import redirect
 # from uuid import UUID
 # Create your models here.
 
@@ -54,6 +56,15 @@ class Profile(models.Model):
 
     def __str__(self):
         return f'{self.user.username} Profile'
+
+    def get_absolute_url(self):
+        return reverse('follower', kwargs={'user_id': self.user.id})
+
+    def get_follow_url(self):
+        return reverse('follow_toggle', kwargs={'user_id': self.user.id})
+
+    def get_follow_api_url(self):
+        return reverse('follow_api', kwargs={'user_id': self.user.id})
 
     def save(self, *args, **kwargs):
         super(Profile, self).save(*args, **kwargs)

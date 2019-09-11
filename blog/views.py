@@ -21,14 +21,12 @@ from hitcount.models import HitCount
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from user.models import Profile
 # REST FRAMEWORK
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
 from django.contrib.auth.models import User
-
-
 
 # Create your views here.
 
@@ -55,7 +53,8 @@ def home(request):
     template_name = 'blog/home.html'  # <app>/<model>_<viewtype>.html
     ordering = ['-date_posted']
     context_object_name = 'posts'
-    paginate_by = 10'''
+    paginate_by = 10
+'''
 
 
 class PostListView(ListView):
@@ -180,7 +179,6 @@ class HashSearchView(ListView):
     paginate_by = 30
     context_object_name = 'posts'
     template_name = 'blog/HashSearch.html'
-    # count = 0
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
@@ -644,7 +642,6 @@ class ShareLikeToggle(LoginRequiredMixin, RedirectView):
                 obj.likes.add(user)
         return url_
 
-
 class UserPostListView(ListView):
     model = Post
 
@@ -698,7 +695,6 @@ class UserPostListView(ListView):
         }
         return render(request, 'blog/user_posts.html', context)
 
-
 def user_post(request, username):
     user = get_object_or_404(User, username=username)
     profile_user_id = get_object_or_404(User, username=username).profile
@@ -733,6 +729,56 @@ def user_post(request, username):
     }
 
     return render(request, 'blog/user_posts.html', context)
+
+class FollowToggle(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args,**kwargs):
+        pk = self.kwargs.get('user_id')
+        profile_user_id = Profile.objects.get(user_id=pk)
+        v_user= Profile.objects.get(user_id=self.request.user.id).id
+        url_ = profile_user_id.get_absolute_url()
+        profile_user_id_2 = Profile.objects.get(user_id=pk).id
+        v_user_2 = Profile.objects.get(user_id=self.request.user.id).id
+        user = User.objects.get(id=pk)
+
+        if profile_user_id.following.filter(id__iexact=v_user).exists():
+            profile_user_id.following.remove(v_user)
+            v_user_2.follower.remove(profile_user_id_2)
+        else:
+            profile_user_id.following.add(v_user)
+            v_user_2.follower.add(profile_user_id_2)
+        return url_
+
+class FollowAPIToggle(APIView):
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, user_id=None, format=None):
+        profile = get_object_or_404(Profile, user_id=user_id)
+        profile_ = User.objects.get(id=user_id)
+        updated = False
+        is_follow = False
+        url_ = profile.get_absolute_url()
+        user = get_object_or_404(Profile, user_id=request.user.id)
+        user_ = get_object_or_404(User, id=request.user.id)
+        if request.user.is_authenticated:
+            if profile.following.filter(id__iexact=user.id).exists():
+                profile.following.remove(user)
+                user.follower.remove(profile)
+                is_follow = False
+            else:
+                profile.following.add(user)
+                user.follower.add(profile)
+                is_follow = True
+                if self.request.user != profile_ :
+                    notify.send(request.user, recipient=profile_, verb='followed you')
+
+            updated = True
+
+        data = {
+            'updated': updated,
+            'is_follow': is_follow
+        }
+        return Response(data)
 
 
 @login_required
@@ -787,24 +833,13 @@ def view_followers(request, username):
 
 
 def view_following(request, username):
-    profile_user_id = get_object_or_404(User, username=username).profile
+    profile_user_id = get_object_or_404(Profile, user__username=username)
     follower_list = profile_user_id.follower.all()
-    '''
-    profile_user_id2 = get_object_or_404(User, username=username).profile.id
-    v_user = User.objects.get(id=request.user.id).profile
-    v_user2 = User.objects.get(id=request.user.id).profile.id
-    profile = User.objects.get(username=username).profile
-    is_follow = False
-    is_user = False
-    if v_user == profile:
-        is_user = True 
-
-    if profile_user_id.follower.filter(id=v_user2).exists():
-        is_follow = True
-    '''
+    v_user_profile = get_object_or_404(Profile, user_id=request.user.id)
     context = {
         'follower_list': follower_list,
         'username': username,
+        'user': v_user_profile
     }
 
     return render(request, 'blog/following.html', context)
@@ -855,7 +890,8 @@ class CreatePostView(LoginRequiredMixin, View):
         if request.method == 'POST':
             form = PostCreateForm(request.POST, request.FILES or None)
             formset = ImageFormset(request.POST or None, request.FILES or None)
-            # vidform = VideoForm(request.POST or None, request.FILES or None)
+            if formset.is_valid():
+                print('fALSE')
             if form.is_valid() and formset.is_valid():
                 post = form.save(commit=False)
                 post.user = request.user
