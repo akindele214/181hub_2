@@ -345,7 +345,7 @@ class DeleteShareJob(LoginRequiredMixin, UserPassesTestMixin, DeleteView, Redire
         return False
 
     def get_success_url(self):
-        return reverse('job-thread', kwargs={'pk': self.object.job.id})
+        return reverse('job-thread', kwargs={'pk': self.object.job.pk})
 
 class ShareJobThread(ListView):
     model = ShareJob
