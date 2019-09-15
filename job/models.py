@@ -1,15 +1,30 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.models import User
 from django.utils import timezone 
+from profanity.validators import validate_is_profane
+from django.shortcuts import redirect, reverse
 # Create your models here.
+
+
+class JobManager(models.Manager):
+    def search(self, query=None):
+        qs = self.get_queryset()
+        if query is not None:
+            or_lookup = (Q(job_title__icontains=query)|
+                         Q(job_description__icontains=query)|
+                         Q(job_summary__icontains=query)
+                        )
+            qs = qs.filter(or_lookup).distinct() # distinct() is often necessary with Q lookups
+        return qs
 
 class JobOpening(models.Model):
 
     FIELD_CHOICES = [
         ('', 'Select Field'),
-        ('admin', 'Administration/Secretarial'),
-        ('agric', 'Agriculture/Agro-Allied'),
-        ('arts/crafts/languages', 'Arts/Crafts/Languages'),
+        ('Administration/Secretarial', 'Administration/Secretarial'),
+        ('Agriculture/Agro-Allied', 'Agriculture/Agro-Allied'),
+        ('Arts/Crafts/Languages', 'Arts/Crafts/Languages'),
         ('Aviation/Airline', 'Aviation/Airline'),
         ('Banking', 'Banking'),
         ('Building and Construction', 'Building and Construction'),
@@ -22,9 +37,9 @@ class JobOpening(models.Model):
         ('General', 'General'),
         ('Graduate Jobs', 'Graduate Jobs'),
         ('Hospitality/Hotel/Restaurant', 'Hospitality/Hotel/Restaurant'),
-        ('HR', 'Human Resources'),
+        ('Human Resources', 'Human Resources'),
         ('Insurance', 'Insurance'),
-        ('ICT', 'ICT/Computer'),
+        ('ICT/Computer', 'ICT/Computer'),
         ('Internships / Volunteering', 'Internships / Volunteering'),
         ('Janitorial Services', 'Janitorial Services'),
         ('Law / Legal', 'Law/Legal'),
@@ -50,7 +65,7 @@ class JobOpening(models.Model):
         ('', 'Select Industry'),
         ('Advertising / Branding / PR', 'Advertising / Branding / PR'),
         ('Agriculture / Agro-Allied', 'Agriculture / Agro-Allied'),
-        ('any','Any'),
+        ('Any','Any'),
         ('Aviation / Airline', 'Aviation / Airline'),
         ('Banking / Financial Services', 'Banking / Financial Services'),
         ('Building / Construction', 'Building / Construction'),
@@ -94,12 +109,14 @@ class JobOpening(models.Model):
         ('Vocational', 'Vocational'),
         ('Others', 'Others'),
     ]
+
     EXPERIENCE_CHOICES = [
         ('', 'Select Experience Required'),
-        ('1-4', '1-4 years'),
-        ('5-10', '5-10 years'),
-        ('11-35', '11-35 years')
+        ('1-4 years', '1-4 years'),
+        ('5-10 years', '5-10 years'),
+        ('11-35 years', '11-35 years')
     ]
+
     STATE_CHOICES =  [       
             ('Abia', 'Abia'),
             ('Abuja','Abuja'),
@@ -140,20 +157,52 @@ class JobOpening(models.Model):
             ('Yobe', 'Yobe'),
             ('Zamfara', 'Zamfara'),
     ]
+
+    JOB_TYPE_CHOICES = [
+        ('Full Time', 'Full Time'),
+        ('Contract', 'Contract')
+    ]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     job_title = models.CharField(max_length=140)
+    job_summary = models.TextField()
     job_description = models.TextField()
+    company_name = models.CharField(max_length=140)
+    saved = models.ManyToManyField(User, related_name='saved_job', blank=True)
+    job_type = models.CharField(choices=JOB_TYPE_CHOICES, max_length=15)
     company_email = models.EmailField(max_length=254)
     method_of_application = models.TextField(blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)
     experience = models.CharField(choices=EXPERIENCE_CHOICES, max_length=20)
-    image = models.ImageField(upload_to='company_pic/', blank=True, null=True)
     field = models.CharField(choices=FIELD_CHOICES, max_length=140)
-    state = models.CharField(max_length=20)
+    state = models.CharField(max_length=140)
     education = models.CharField(max_length=140)
     industry = models.CharField(choices=INDUSTRY_CHOICES, max_length=140)
     send_cv_directly = models.BooleanField(default=False)
+    objects = JobManager()
     
     def __str__(self):
         return '{} - {}'.format(self.user, self.job_title)
+
+    def get_absolute_url(self):
+        return reverse('job-detail', kwargs={'pk': self.pk})
+
+    def get_api_save_job_url(self):
+        return reverse("save-job-api-toggle", kwargs={'pk': self.pk})
+    
+    def get_save_job_url(self):
+        return reverse("save-job-toggle", kwargs={'pk': self.pk})
         
+
+class ShareJob(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    job = models.ForeignKey(JobOpening, on_delete=models.CASCADE)
+    content = models.TextField(validators=[validate_is_profane], null=True, blank=True)
+    likes = models.ManyToManyField(User, related_name='share_job_likes', blank=True)
+    image = models.ImageField(upload_to='shared_pic/', blank=True, null=True)
+    date_posted = models.DateTimeField(default=timezone.now)
+    is_quote = models.BooleanField(default=False)
+    share_post = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True)
+    
+    def get_absolute_url(self):
+        return reverse('job-thread', kwargs={'pk': self.post.pk})

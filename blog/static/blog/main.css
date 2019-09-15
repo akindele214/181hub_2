@@ -60,9 +60,9 @@ a.article-title:hover {
 }
 
 .article-img {
-  height: 45px;
-  width: 45px;
-  margin-right: 4px;
+  height: 35px;
+  width: 35px;
+  margin-right: 2px;
   object-fit: cover;
 }
 

@@ -1,0 +1,68 @@
+{% extends 'blog/base.html' %}
+{% load crispy_forms_tags %}
+{% load blog_tags %}
+{% block title %}Share Post - {{block.super}}{%endblock%}
+{% block content %}
+    <div class="content-section">
+    	<legend class="border-bottom mb-4">
+                   Share Job Post
+                </legend>
+        <!-- Post -->
+    <article class="media content-section"> 
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' post.user.username %}">{{ post.user }}{% if post.user.profile.verified%} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <small class="text-muted">{{ post.date_posted|timesince|upto:','  }} ago</small>
+            </div>
+            <h5><a class="article-title" href="{% url 'job-detail' post.pk %}">{{ post.job_title }}</a> <span class="badge badge-pill badge-secondary ml-2">{{post.job_type}}</span></h5>
+              <p class="article-content" style="white-space:normal;">{{ post.job_summary|truncatewords:"31"|hashtag_links|mention_link|urlize }}              
+                {% ifnotequal post.job_summary|truncatewords:"30"|length post.job_summary|truncatewords:"31"|length %}
+                <a href="{% url 'job-detail' post.pk %}" class="mt-0" >read more</a>
+                {% endifnotequal %}
+              {% comment %} <br>
+              <i class="fas fa-map-marker-alt mt-2"></i> {{post.state}} {%for s in post.state %} {{s.all}} {%endfor%} 	&nbsp;	&nbsp; <i class="far fa-building mt-2"></i> {{post.company_name}} {% endcomment %}
+              </p>            
+            
+              
+              <p class="mt-2">
+              <small class="text-muted" style="float: left;">
+                <i class="fas fa-map-marker-alt fa-lg"></i> {{post.state}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="far fa-building fa-lg"></i> {{post.company_name}}&nbsp;&nbsp;&nbsp;
+                <!--Post Like-->
+                {%if request.user.is_authenticated%}
+                {% comment %} {% if request.user in post.likes.all%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {%else%}
+                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {% endif %}          
+                <a href="{% url 'share_post' pk=post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a> {% endcomment %}
+                {% if request.user in post.saved.all %}
+                <a class="save-job-btn" href="{{post.get_save_job_url}}" data-href="{{post.get_api_save_job_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-2" id="save"></i>&nbsp; Unsave Job
+                </a>
+                {% else %}
+                <a class="save-job-btn" href="{{post.get_save_job_url}}" data-href="{{post.get_api_save_job_url}}" data-toggle="tooltip" title="Save Job" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-2" id="save" ></i>&nbsp; Save Job
+                </a>
+                {% endif %}      
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted ml-2" style="float: right; font-size: 1em;">log in to save and share post</small></a>
+                {%endif%}
+              </small>
+              </p>
+
+          </div>
+        </article>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info" type="submit">Share</button>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

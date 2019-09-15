@@ -27,15 +27,12 @@ def create_hashtag_link(tag):
     url = "/hashtag/{}/".format(tag)
     return '<a href="{}">#{}</a>'.format(url, tag)
 
-
 @register.filter()
 def hashtag_links(value):
     return mark_safe(
         re.sub(r"#(\w+)", lambda m: create_hashtag_link(m.group(1)),
                (value)))
 
-
-# user/<str:username>
 def create_mention_link(mention):
     user_name = mention.replace('@','')
     try:
@@ -47,10 +44,20 @@ def create_mention_link(mention):
 #     link = "/mention/{}/".format(user_name)
 #     return '<a href="{}">{}</a>'.format(link, mention)
 
-
 @register.filter()
 def mention_link(value):
     return mark_safe(
         re.sub(r"@(\w+)", lambda x: create_mention_link(x.group(0)),
                (value)))
 
+@register.filter
+def so_bracket(value):
+    return value.replace("[","")
+
+@register.filter
+def sc_bracket(value):
+        return value.replace("]","")
+
+@register.filter
+def colon(value):
+        return value.replace("'","")

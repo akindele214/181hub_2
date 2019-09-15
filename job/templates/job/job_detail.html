@@ -1,0 +1,253 @@
+{% extends 'blog/base.html' %}
+{% block title %}{{object.job_title}} - {{block.super}}{%endblock%}
+{% load crispy_forms_tags %}
+{% load blog_tags %}
+{% load hitcount_tags %}
+{% load staticfiles %}
+{% get_hit_count_js_variables for object as hitcount %}
+{% get_hit_count for object as total_hits %}
+
+
+
+<script src="{% static 'hitcount/jquery.postcsrf.js' %}"></script>
+
+{% get_hit_count_js_variables for object as hitcount %}
+{% get_hit_count for object as total_hits %}
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+  $.postCSRF("{{ hitcount.ajax_url }}", { hitcountPK : "{{ hitcount.pk }}" })
+    .done(function(data){
+      $('<i />').text(data.hit_counted).attr('id','hit-counted-value').appendTo('#hit-counted');
+      $('#hit-response').text(data.hit_message);
+  }).fail(function(data){
+      console.log('POST failed');
+      console.log(data);
+  });
+});
+</script>
+
+{% block content %}
+{% get_hit_count_js_variables for object as hitcount %}
+{% get_hit_count for object as object_hits %}
+<script src="{% static 'hitcount/jquery.postcsrf.js' %}"></script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+  $.postCSRF("{{ hitcount.ajax_url }}", { hitcountPK : "{{ hitcount.pk }}" })
+    .done(function(data){
+      $('<i />').text(data.hit_counted).attr('id','hit-counted-value').appendTo('#hit-counted');
+      $('#hit-response').text(data.hit_message);
+  }).fail(function(data){
+      console.log('POST failed');
+      console.log(data);
+  });
+});
+</script>
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ object.user.profile.image.url }}" class="rounded-circle article-img">
+              <a class="mr-1" style="color: #444444;"href="{% url 'user-posts' object.user.username %}">{{ object.user }} {% if object.user.profile.verified%} <i class="fas fa-check-circle fa-sm"></i>{%endif%}
+              </a>
+              <small class="text-muted">{{ object.date_posted|timesince|upto:',' }} ago &nbsp;&nbsp;</small>
+        
+                <a href="#" style="color: #5f788a;" data-toggle="modal" data-target="#exampleModalCenter"><i class="fas fa-ellipsis-h fa-lg mt-2" style="float: right;"></i></a>
+                    <!-- Modal -->
+                    <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header"> 
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                          <div class="modal-body">
+                            {% if request.user.is_authenticated %}
+                            {% if object.user == user %}
+                            
+                              <a href="{% url 'job-update' object.id %}" class="text-center"><p>Edit</p></a>
+                              <hr>
+                              <a href="{% url 'job-delete' object.id %}" class="text-center" style="color: red;"><p>Delete</p></a>       
+                              <hr>
+                            {% endif %}
+                            {%endif%}
+                              <a href="{% url 'report-post' object.id %}" class="text-center"><p>Report</p></a>
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button> 
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+            </div>
+            <h5 class="article-title">{{ object.job_title }}</h5>
+            <p class="mt-2 mb-3">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Summary: </span><br>
+                {{ object.job_summary|hashtag_links|mention_link|urlize }}        
+            </p>
+            
+            <p class="mt-2">
+            <small class="" style="flat: left;">
+                <i class="fas fa-map-marker-alt fa-lg" style="color: #5f788a;"></i> {{object.state}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            </small>
+            <small style="float:right">
+                <i class="far fa-building fa-lg" style="color: #5f788a;"></i> {{object.company_name}}&nbsp;&nbsp;&nbsp;
+            </small>
+            </p>
+            <hr>
+            <p class="mt-2" id="industry">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Industry: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{object.industry}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="field">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Field: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{object.field}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="job_type">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Type: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{object.job_type}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="job_description">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Description: </span><br>
+                {{object.job_description}}
+            </p>
+            <hr>
+            <p class="mt-2" id="qualification">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                    Qualification: </span><br>
+                    <ul style="margin-left: -15px; margin-top: -15px;">
+                        <li>{{object.education|sc_bracket|so_bracket|colon}}</li>
+                    </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="experience">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Experience Required: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{object.experience}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="application">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Method of Applicaition: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{object.method_of_application|urlize}}</li>
+                </ul>
+            </p>
+            <hr>
+
+
+
+{% comment %} <div class="container col-sm-12 text-center">
+      <div id="carouselExampleControls" class="row justify-content-md-center carousel slide mb-4" data-ride="carousel" data-interval="false">
+  <div class="carousel-inner">
+    {% for p in object.images_set.all %}
+    <div {% if forloop.first %} class="carousel-item active" {% else %} class="carousel-item" {% endif %}>
+        <img src="{{p.image.url}}" class="img-fluid rounded" alt="...">
+    </div>
+    
+    {%endfor%}
+  </div>
+  {% if object.images_set.count > 1 %}
+    <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="sr-only">Previous</span>
+  </a>
+  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="sr-only">Next</span>
+  </a>
+  {%endif%}
+
+</div>
+</div>
+{% if object.video %}
+<div class="videowrapper ">
+    <video class="afterglow mb-3" id="myvideo" width="1920"  height="1080" loop="loop" data-volume=".5">
+      <source type="video/mp4" src="{{object.video.url}}" />
+    </video>
+    <p class="text-center">Use Full Screen Feature For Better Display</p>
+</div>
+
+{% endif %}
+
+{% if object.audio %}
+<script src="{%static 'blog/audioplayer.js'%}"></script>
+<div class="text-center mb-3">
+		<audio preload="auto" controls>
+			<source src="{{object.audio.url}}">
+		</audio>
+    <a href="{{object.audio.url}}" class="text-muted">Click To Download Mp3</a>
+</div>
+		<script>
+			$(function() {
+				$('audio').audioPlayer();
+			});
+		</script>
+{% endif %} {% endcomment %}
+            
+          <small class="text-muted">
+            {%if request.user.is_authenticated%}
+            {% comment %} {% if request.user in object.likes.all %}
+            <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+            <i class="fas fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+            {%else%}
+            <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+            <i class="far fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+            {% endif %} {% endcomment %}
+            <a href="{% url 'job-share' pk=object.id %}" style="text-decoration: none; color: #5f788a;" data-toggle="tooltip" title="Share Post">
+            <i class="fas fa-exchange-alt fa-lg"></i></a>      
+
+            {% if is_saved %}
+            <a class="save-job-btn" href="{{object.get_save_job_url}}" data-href="{{object.get_api_save_job_url}}" style="text-decoration: none; color: #5f788a; float:right;"><i class="fas fa-bookmark fa-lg ml-2" id="save"></i>&nbsp; Unsave Job
+            </a>
+            {% else %}
+            <a class="save-job-btn" href="{{object.get_save_job_url}}" data-href="{{object.get_api_save_job_url}}" data-toggle="tooltip" title="Save Post" style=" float: right; text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-2" id="save" ></i>&nbsp; Save Job
+            </a>
+            {% endif %}
+            {%else%}
+            <a href="{%url 'login'%}"><small class="text-muted" style="float: left;">log in to like and share post</small></a>
+            <br>
+            {%endif%}
+            </small>
+              {% comment %} {% if is_thread %}
+              <small class="text-muted" style="float: left;"><a href="{% url 'share-thread' object.pk %}" style="text-decoration: none;"> View Thread </a></small>
+              {% endif %}
+              <small class="text-muted" style="float: right;"><i class="far fa-eye"></i> {{ object_hits }} view{{ object_hits|pluralize}}</small>  {% endcomment %}
+ 
+
+            
+          </div>
+
+        </article>
+
+        <br>
+        
+        {% comment %} {% if object.restrict_comment %}
+        <div class="main-comment-section mb-5">
+          <input type="submit" value="Comments Has Been Restricted By {{ object.user }}" class="btn btn-outline-info" disabled>
+        </div>
+        {%else%}
+        <div class="main-comment-section mb-5">
+            {% include 'blog/comments.html' %}
+          </div>
+        {% endif %} {% endcomment %}
+
+{% endblock content %}
+

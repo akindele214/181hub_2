@@ -1,4 +1,4 @@
-from .models import JobOpening
+from .models import JobOpening,ShareJob
 from django.contrib.auth.models import User
 from django import forms
 
@@ -57,11 +57,11 @@ STATE_CHOICES =  [
     ]
 
 class CreateJobForm(forms.ModelForm):
-    state = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=STATE_CHOICES)
+    # state = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=STATE_CHOICES)
     education = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=EDUCATION_CHOICES)
     job_description = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
     method_of_application = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
-    send_cv_directly = forms.BooleanField(label="Click if You'd Like Applicants to Send CV Directly")
+    send_cv_directly = forms.BooleanField(label="Click if You'd Like Applicants to Send CV Directly",required=False)
     company_email = forms.EmailField(widget=forms.TextInput(attrs={'type': 'email','placeholder': "Enter An Email An Applicant Can Send An Application To."}))
 
     class Meta:
@@ -69,6 +69,9 @@ class CreateJobForm(forms.ModelForm):
         fields = (
             'job_title',
             'job_description',
+            'job_summary',
+            'company_name',
+            'job_type',
             'education',
             'industry',
             'field',
@@ -77,5 +80,25 @@ class CreateJobForm(forms.ModelForm):
             'experience',
             'method_of_application',
             'send_cv_directly',
-            'image',
         )
+
+
+class CreateShareForm(forms.ModelForm):
+    content = forms.CharField(label="", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Share...', 'rows': '4', 'cols': '30'}))
+    class Meta:
+        model = ShareJob
+        fields = [
+            'content',
+            'image',
+        ]
+    def __init__(self, *args, **kwargs):
+        super(CreateShareForm, self).__init__(*args, **kwargs)
+        self.fields['content'].required = False
+
+class ShareJobEditForm(forms.ModelForm):
+    class Meta:
+        model = ShareJob
+        fields = ['content', 'image']
+    def __init__(self, *args, **kwargs):
+        super(ShareJobEditForm, self).__init__(*args, **kwargs)
+        self.fields['content'].required = False        

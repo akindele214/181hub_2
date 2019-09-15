@@ -5,7 +5,7 @@ from django.contrib import messages
 from datetime import timedelta
 from django.shortcuts import render, get_object_or_404, redirect, reverse
 from .models import Post, Comment, Share, Images, HashTag, ShareTag, Quote, Report, WebGroup, GroupPost
-from django.views.generic import ListView, View, CreateView, UpdateView, DeleteView, RedirectView
+from django.views.generic import ListView, View, CreateView, UpdateView, DeleteView, RedirectView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.http import JsonResponse, HttpResponseRedirect, Http404  # HttpResponse, Http404
@@ -22,6 +22,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from user.models import Profile
+from job.models import JobOpening
 # REST FRAMEWORK
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -166,7 +167,8 @@ class SearchView(ListView):
         if len(query) > 2:
             blog_results = Post.objects.search(query)
             profile_results = Profile.objects.search(query)
-            queryset_chain = chain(profile_results, blog_results)
+            job_results = JobOpening.objects.search(query)
+            queryset_chain = chain(profile_results, blog_results, job_results)
 
             qs = sorted(queryset_chain, key=lambda instance: instance.pk,
                         reverse=True)
@@ -467,15 +469,24 @@ def saved_post_list(request):
 
 
 class SavedPostListView(LoginRequiredMixin,ListView):
-    model = Post
+    # model = Post
     template_name = 'blog/saved_post_list.html'  # <app>/<model>_<viewtype>.html
     context_object_name = 'saved_post'
     paginate_by = 30
 
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['model'] = self.model
+        return context
+    
     def get_queryset(self):
         users = self.request.user 
+        post_results = Post.objects.filter(saved__exact=users).order_by('-date_posted')
+        job_results = JobOpening.objects.filter(saved__exact=users).order_by('-date_posted')
+        queryset_chain = chain(post_results, job_results)
+        qs = sorted(queryset_chain, key=lambda instance: instance.date_posted, reverse=True)
         # users = get_object_or_404(User, username=self.kwargs.get('username'))
-        return Post.objects.filter(saved__exact=users).order_by('-date_posted')
+        return qs
 
 
 @login_required
