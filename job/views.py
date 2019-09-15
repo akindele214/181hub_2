@@ -236,7 +236,7 @@ class ShareJobView(LoginRequiredMixin, CreateView):
                 #         else:
                 #             pass
             messages.success(request, f'Job Shared')
-            return redirect('job-thread', pk=pk)
+            return redirect('job-thread', id=pk)
         else:
             form = ShareJob()
         context = {
