@@ -116,14 +116,14 @@
 
                 <!--Share Like-->
                 {%if request.user.is_authenticated%}
-                {% comment %} {% if request.user in post.likes.all%}
-                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                {% if request.user in post.likes.all%}
+                <a class="like-btn-share" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
                 <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
                 {%else%}
-                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <a class="like-btn-share" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
                 <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
-                {% endif %} {% endcomment %}
-                <a href="{% url 'quote-share' post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-2 fa-lg"></i></a>
+                {% endif %}
+                <a href="{% url 'quote-share-job' post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-2 fa-lg"></i></a>
                 {%else%}
                 <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like and share post</small></a>
                 {%endif%}

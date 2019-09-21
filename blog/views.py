@@ -22,7 +22,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from user.models import Profile
-from job.models import JobOpening
+from job.models import JobOpening, ShareJob
 # REST FRAMEWORK
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -73,10 +73,12 @@ class PostListView(ListView):
     def get_queryset(self):
         posts = []
         shared_post = []
+        shared_job = []
         hash_post = []
         user_final_hashtag = []
         final_hash_post = []
         final_post = []
+
         if self.request.user.is_authenticated:
             user_id = self.request.user.id
             view_user_post = Post.objects.filter(user__exact=self.request.user)
@@ -87,18 +89,17 @@ class PostListView(ListView):
             all_tag = HashTag.objects.filter(date_posted__gt=last_week).exclude(user=self.request.user).values_list('post', flat=True).distinct()
             # users_hashtag = HashTag.objects.filter(date_posted__gt=last_week, user__exact=self.request.user)
             users_hashtag = HashTag.objects.filter(date_posted__gt=last_week, user__exact=self.request.user).values_list('tag', flat=True).distinct()
-            print(users_hashtag)
+            # print(users_hashtag)
 
 
             for hashtag in users_hashtag:
                 for final_hashtag in HashTag.objects.filter(date_posted__gt=last_week, tag__iexact=hashtag).exclude(user=self.request.user).values_list('post', flat=True).distinct():
-                    hash_post.append(final_hashtag)
-            print(hash_post)
+                    hash_post.append(final_hashtag)            
             
             for final_hashtag_post in hash_post:
                 final_ = Post.objects.get(pk=final_hashtag_post)
                 user_final_hashtag.append(final_)
-            print(user_final_hashtag) 
+            
             for postx in all_tag:
                 post_post = Post.objects.get(pk=postx)
                 final_post.append(post_post)
@@ -111,12 +112,18 @@ class PostListView(ListView):
                 for share in Share.objects.filter(user__exact=profile.user):
                     shared_post.append(share)
 
+            for profile in user_profile.follower.all():
+                for share_job in ShareJob.objects.filter(user__exact=profile.user):
+                    shared_job.append(share_job)
+
             for f_post in user_final_hashtag:
                 if f_post.user.profile not in user_profile.follower.all():
                     final_hash_post.append(f_post)
-            # logged_in_user_shared_post = Share.objects.filter(post__user=self.request.user)
+
             logged_in_user_shared_post = Share.objects.filter(user__exact=self.request.user.id)
-            chain_qs = chain(posts, view_user_post, shared_post,logged_in_user_shared_post, final_hash_post)
+            logged_in_user_shared_job_post = ShareJob.objects.filter(user__exact=self.request.user.id)
+            # print(logged_in_user_shared_job_post)
+            chain_qs = chain(posts, view_user_post, shared_post, logged_in_user_shared_post, final_hash_post, logged_in_user_shared_job_post, shared_job)
             return sorted(chain_qs, key=lambda x: x.date_posted, reverse=True)
 
         else:
@@ -603,6 +610,7 @@ class ShareLikeAPIToggle(APIView):
         return Response(data)
 
 class SavePostToggle(LoginRequiredMixin, RedirectView):
+
     def get_redirect_url(self, *args, **kwargs):
         pk = self.kwargs.get('pk')
         post = get_object_or_404(Post, pk=pk)
@@ -817,7 +825,6 @@ def follow(request, user_id):
     next_page = request.META.get('HTTP_REFERER', None) or '/'
     return HttpResponseRedirect(next_page)
 
-
 def view_followers(request, username):
     profile_user_id = get_object_or_404(User, username=username).profile
     follower_list = profile_user_id.following.all()
@@ -842,7 +849,6 @@ def view_followers(request, username):
 
     return render(request, 'blog/follower.html', context)
 
-
 def view_following(request, username):
     profile_user_id = get_object_or_404(Profile, user__username=username)
     follower_list = profile_user_id.follower.all()
@@ -854,7 +860,6 @@ def view_following(request, username):
     }
 
     return render(request, 'blog/following.html', context)
-
 
 class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
@@ -871,7 +876,6 @@ class PostUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
             return True
         return False
 
-
 class PostCreateView(LoginRequiredMixin, CreateView):
     model = Post
     fields = ['title', 'content', 'restrict_comment']
@@ -879,7 +883,6 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
-
 
 class CreatePostView(LoginRequiredMixin, View):
     model = Post
@@ -901,8 +904,7 @@ class CreatePostView(LoginRequiredMixin, View):
         if request.method == 'POST':
             form = PostCreateForm(request.POST, request.FILES or None)
             formset = ImageFormset(request.POST or None, request.FILES or None)
-            if formset.is_valid():
-                print('fALSE')
+
             if form.is_valid() and formset.is_valid():
                 post = form.save(commit=False)
                 post.user = request.user
@@ -1138,8 +1140,8 @@ class ShareReport(LoginRequiredMixin, CreateView):
         return render(request, 'blog/report_post.html', context)
 
 class QuoteShare(LoginRequiredMixin, CreateView):
-    model = Quote
-    fields = ['content', 'share', 'user']
+#    model = Quote
+#    fields = ['content', 'share', 'user']
     context_object_name = 'share'
 
     def get(self, request, *args, **kwargs):
@@ -1375,7 +1377,6 @@ class ShareEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView, Redirec
     def get_success_url(self):
         return reverse('share-thread', kwargs={'pk': self.object.post.id})
 
-
 def share_post(request, pk):
     post = get_object_or_404(Post, pk=pk) 
 
@@ -1408,7 +1409,6 @@ def share_post(request, pk):
 
     return render(request, 'blog/share.html', context)
 
-
 class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
     success_url = '/'
@@ -1429,8 +1429,6 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         success_url = self.get_success_url()
         self.object.delete()
         return HttpResponseRedirect(success_url)
-
-
 
 class GroupCreate(LoginRequiredMixin, View):
     model = WebGroup
@@ -1460,7 +1458,6 @@ class GroupCreate(LoginRequiredMixin, View):
             'form': form,
         }
         return render(request, 'blog/group_create.html', context)
-
 
 class GroupPostCreate(LoginRequiredMixin, UserPassesTestMixin, View):
     model = GroupPost
@@ -1515,7 +1512,6 @@ class GroupPostCreate(LoginRequiredMixin, UserPassesTestMixin, View):
             return True
         return False
 
-
 class GroupLikeToggle(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         pk = self.kwargs.get('pk')
@@ -1565,7 +1561,6 @@ class GroupLikeAPIToggle(APIView):
             "like_count": obj.likes.count()
         }
         return Response(data)
-
 
 def trending(request):
     post = Post.objects.filter(hit_count_generic__gt=105)

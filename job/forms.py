@@ -102,3 +102,14 @@ class ShareJobEditForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ShareJobEditForm, self).__init__(*args, **kwargs)
         self.fields['content'].required = False        
+
+class QuoteJobForm(forms.ModelForm):
+    content = forms.CharField(label="", required=False, widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Talk Your Own', 'rows': '4', 'cols': '30'}))
+
+    class Meta:
+        model = ShareJob 
+        fields = ['content', 'image']
+    
+    def __init__(self, *args, **kwargs):
+        super(QuoteJobForm, self).__init__(*args, **kwargs)
+        self.fields['content'].required = False    

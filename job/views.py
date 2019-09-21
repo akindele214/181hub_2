@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404, HttpResponseRedirect, reverse
 from django.views.generic import ListView, View, CreateView, UpdateView, DeleteView, RedirectView, DetailView
-from .models import JobOpening, ShareJob
+from .models import JobOpening, ShareJob, RequestJob
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from .forms import CreateJobForm, CreateShareForm, ShareJobEditForm
+from django.contrib.messages.views import SuccessMessageMixin
+from .forms import CreateJobForm, CreateShareForm, ShareJobEditForm, QuoteJobForm
 from django.contrib import messages
 # REST FRAMEWORK
 from rest_framework.views import APIView
@@ -112,7 +113,8 @@ class JobDetail(DetailView):
 
 class JobUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = JobOpening
-    fields = ['job_title',
+    fields = [
+              'job_title',
               'job_description',
               'job_summary',
               'company_name',
@@ -236,7 +238,7 @@ class ShareJobView(LoginRequiredMixin, CreateView):
                 #         else:
                 #             pass
             messages.success(request, f'Job Shared')
-            return redirect('job-thread', id=pk)
+            return redirect('job-thread', pk=pk)
         else:
             form = ShareJob()
         context = {
@@ -364,3 +366,112 @@ class ShareJobThread(ListView):
         shares = ShareJob.objects.filter(job__exact=post_id)
         share = shares.order_by('date_posted')
         return share    
+    
+class LikeShareJobToggle(LoginRequiredMixin, RedirectView):
+    def get_redirect_url(self, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        print(pk)
+        obj = get_object_or_404(ShareJob, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.add(user)
+        return url_    
+
+class LikeShareApiToggle(APIView):
+    """
+    View to list all users in the system.
+
+    * Requires token authentication.
+    * Only authenticated users are able to access this view.
+    """
+    authentication_classes = [authentication.SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, pk=None, format=None):
+        # pk = self.kwargs.get('pk')
+        obj = get_object_or_404(ShareJob, pk=pk)
+        url_ = obj.get_absolute_url()
+        user = self.request.user
+        updated = False
+        liked = False
+
+        if user.is_authenticated:
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+                liked = False
+            else:
+                obj.likes.add(user)
+                liked = True
+                # if request.user != obj.user:
+                #     notify.send(request.user, recipient=obj.user, verb='liked your post in a thread', action_object=obj.post,description=obj.content)
+            updated = True
+        data = {
+            "updated": updated,
+            "liked": liked,
+            "like_count": obj.likes.count()
+        }
+        return Response(data)
+
+class QuoteJobShare(LoginRequiredMixin, CreateView):
+
+    def get(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        form = QuoteJobForm()
+        share_post = get_object_or_404(ShareJob, pk=pk)
+        context = {
+            'form': form,
+            'share_post': share_post, 
+        }
+        return render(request, 'blog/quote.html', context)
+    
+    def post(self, request, *args, **kwargs):
+        pk = kwargs['pk']
+        share_post = get_object_or_404(ShareJob, pk=pk)
+        if request.method == 'POST':
+            quote_form = QuoteJobForm(request.POST or None, request.FILES or None)
+            if quote_form.is_valid():
+                image = quote_form.cleaned_data['image']
+                content = quote_form.cleaned_data['content']
+                share_pk = pk
+                quote_create = ShareJob.objects.create(job=share_post.job, share_post=share_post, is_quote=True, user=request.user, content = content, image=image)
+                quote_create.save()
+
+                # for word in content.split():
+                #     if len(word) > 1:
+                #         if word.startswith("#"):
+                #             wo = word.replace('#', '')
+                #             hash_tag = ShareTag(share=quote_create, tag=wo, user=request.user)
+                #             hash_tag.save()
+                # for word in content.split():
+                #     if word.startswith("@"):
+                #         w = word.replace('@', '')
+                #         if User.objects.get(username__iexact=w):
+                #             notify.send(request.user, recipient=User.objects.get(username__iexact=w),
+                #                         verb='mentioned you in a post thread', action_object=share_post.post, description=content)
+                #         else:
+                #             pass
+
+            messages.success(request, f'Done')
+            return redirect('job-thread', pk=share_post.job.pk)
+        else:
+            form = QuoteJobForm()
+        context = {
+            'form': form,
+            'share_post': share_post
+        }
+        return render(request, 'blog/quote.html', context)
+
+
+class RequestJob(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+    model = RequestJob
+    template_name = 'job/request_job.html'
+    fields = ['job_type', 'field', 'industry', 'education', 'state', 'experience']
+    success_message = "Request Submitted, You'll Be Notified When A Job That Matches Your Specification Is In The Database"
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)

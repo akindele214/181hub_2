@@ -26,14 +26,16 @@
                 <i class="far fa-building fa-lg"></i> {{post.company_name}}&nbsp;&nbsp;&nbsp;
                 <!--Post Like-->
                 {%if request.user.is_authenticated%}
-                {% comment %} {% if request.user in post.likes.all%}
-                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
-                <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
-                {%else%}
-                <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
-                <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
-                {% endif %}          
-                <a href="{% url 'share_post' pk=post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a> {% endcomment %}
+                {% comment %} 
+                  {% if request.user in post.likes.all%}
+                  <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                  <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                  {%else%}
+                  <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                  <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                  {% endif %}          
+                  <a href="{% url 'share_post' pk=post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a> 
+                {% endcomment %}
                 {% if request.user in post.saved.all %}
                 <a class="save-job-btn" href="{{post.get_save_job_url}}" data-href="{{post.get_api_save_job_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-2" id="save"></i>&nbsp; Unsave Job
                 </a>
