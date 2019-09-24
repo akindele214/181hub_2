@@ -12,8 +12,7 @@ from rest_framework import authentication, permissions
 
 # Create your views here.
 
-class AllJobs(ListView):
-    
+class AllJobs(ListView):    
     ordering = ['-date_posted']
     context_object_name = 'posts'
     paginate_by = 30
@@ -30,7 +29,6 @@ class AllJobs(ListView):
 
 class CreateJobOpening(LoginRequiredMixin, CreateView):
     model = JobOpening
-    paginate_by = 30
 
     def get(self, request):
         form = CreateJobForm()
@@ -41,33 +39,40 @@ class CreateJobOpening(LoginRequiredMixin, CreateView):
     
     def post(self, request):
         if request.method == 'POST':
-            form = CreateJobForm(request.POST, request.FILES or None)
+            form = CreateJobForm(request.POST or None)
             if form.is_valid():
-                print('Valid form')
+                print('Valid Form')
                 job_title = form.cleaned_data['job_title']
                 method_of_application = form.cleaned_data['method_of_application']
                 field = form.cleaned_data['field']
                 education = form.cleaned_data['education']
                 industry = form.cleaned_data['industry']
-                image = form.cleaned_data['image']  # request.POST.get('image')
                 job_description = form.cleaned_data['job_description']
+                job_summary = form.cleaned_data['job_summary']
                 send_cv_directly = form.cleaned_data['send_cv_directly']
                 experience = form.cleaned_data['experience']
                 job_type = form.cleaned_data['job_type']
                 state = form.cleaned_data['state']
                 company_name = form.cleaned_data['company_name']
-                job_create =  JobOpening.objects.create(user= request.user, job_title= job_title, 
+
+                job_create =  JobOpening.objects.create(user= request.user, 
+                                                        job_title= job_title, 
                                                         job_description= job_description, 
+                                                        job_summary= job_summary,
                                                         company_name=company_name,
-                                                        industry= industry, field= field, 
-                                                        education= education, experience=experience,
+                                                        industry= industry, 
+                                                        field= field, 
+                                                        education= education, 
+                                                        experience=experience,
                                                         send_cv_directly=send_cv_directly,
                                                         job_type=job_type,
-                                                        method_of_application= method_of_application, 
-                                                        image= image, state=state)
+                                                        method_of_application= method_of_application,
+                                                        state=state
+                                                        )
                 job_create.save()            
                 return redirect('all_jobs')
             else:
+                print(form.non_field_errors)
                 print('Invalid form')    
         else:
 
@@ -127,7 +132,6 @@ class JobUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
               'experience',
               'method_of_application',
               'send_cv_directly',
-              'image'
              ]
     template_name = 'blog/postupdate.html'
 
@@ -143,7 +147,7 @@ class JobUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
 
 class DeleteJobView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = JobOpening
-    success_url = '/'
+    # success_url = reverse('all_jobs')
 
     def test_func(self):
         post = self.get_object()
@@ -154,9 +158,9 @@ class DeleteJobView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
         user = self.object.user
-        success_url = self.get_success_url()
+        # success_url = self.get_success_url()
         self.object.delete()
-        return HttpResponseRedirect(success_url)
+        return redirect('all_jobs')
 
 class SaveJobToggle(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
@@ -466,7 +470,7 @@ class QuoteJobShare(LoginRequiredMixin, CreateView):
         return render(request, 'blog/quote.html', context)
 
 
-class RequestJob(LoginRequiredMixin, SuccessMessageMixin, CreateView):
+class RequestJobCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = RequestJob
     template_name = 'job/request_job.html'
     fields = ['job_type', 'field', 'industry', 'education', 'state', 'experience']
@@ -475,3 +479,27 @@ class RequestJob(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     def form_valid(self, form):
         form.instance.user = self.request.user
         return super().form_valid(form)
+
+class RequestJobList(LoginRequiredMixin, ListView):
+    model =  RequestJob
+    template_name = 'job/request_list.html'
+    context_object_name = 'posts'
+
+    def get_queryset(self):
+        posts = RequestJob.objects.filter(user__exact=self.request.user).order_by('-date_posted')
+        return posts      
+
+class RequestDeleteView(LoginRequiredMixin, SuccessMessageMixin, UserPassesTestMixin, DeleteView):
+    model = RequestJob
+    template_name = 'job/request_confirm_delete.html'
+    context_object_name = "share"
+
+    def test_func(self):
+        share = self.get_object()
+        if self.request.user == share.user:
+            return True
+        return False
+
+    def get_success_url(self):
+        messages.success(self.request, 'Your Job Request Has Been Deleted')
+        return reverse('request-list')

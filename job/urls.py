@@ -14,7 +14,9 @@ from .views import (AllJobs,
                     LikeShareApiToggle,
                     LikeShareJobToggle,
                     QuoteJobShare,
-                    RequestJob
+                    RequestJobCreateView,
+                    RequestJobList,
+                    RequestDeleteView
                     )
 
 
@@ -31,7 +33,11 @@ urlpatterns = [
     path('<int:pk>/thread', ShareJobThread.as_view(), name='job-thread'),
     path('<int:pk>/share', ShareJobView.as_view(), name='job-share'),
     path('<int:pk>/quote', QuoteJobShare.as_view(), name='quote-share-job'),    
-    path('request', RequestJob.as_view(), name='request-job'),
+
+    path('request', RequestJobCreateView.as_view(), name='request-job'),
+    path('requestlist/', RequestJobList.as_view(), name='request-list'),
+    path('<int:pk>/request/delete', RequestDeleteView.as_view(), name='request-delete'),
+
     path('<int:pk>/share/delete', DeleteShareJob.as_view(), name='job-share-delete'),
     path('<int:pk>/share/update', ShareJobUpdateView.as_view(), name='job-share-update'),
     path('<int:pk>/share/like', LikeShareJobToggle.as_view(), name='share-job-like-toggle'),

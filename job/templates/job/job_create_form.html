@@ -11,11 +11,12 @@
                 {{ form|crispy }}
             </fieldset>
             <div class="form-group">
+            {{ form.errors }}
                 <button class="btn btn-outline-info" type="submit">Post</button>
             </div>
         </form>
     </div>
-<script type="text/javascript">
+{% comment %} <script type="text/javascript">
     var uploadField = document.getElementById("id_video");
   
     uploadField.onchange = function() {
@@ -31,5 +32,5 @@
             this.value = "";
         }
     }
-</script>
+</script> {% endcomment %}
 {% endblock content %}

@@ -1,4 +1,4 @@
-from .models import JobOpening,ShareJob
+from .models import JobOpening, ShareJob
 from django.contrib.auth.models import User
 from django import forms
 
@@ -58,7 +58,7 @@ STATE_CHOICES =  [
 
 class CreateJobForm(forms.ModelForm):
     # state = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=STATE_CHOICES)
-    education = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=EDUCATION_CHOICES)
+    # education = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=EDUCATION_CHOICES)
     job_description = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
     method_of_application = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
     send_cv_directly = forms.BooleanField(label="Click if You'd Like Applicants to Send CV Directly",required=False)

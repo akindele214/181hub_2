@@ -1,0 +1,73 @@
+{% extends 'blog/base.html' %}
+{% block title %}Your Job Request- {{block.super}}{%endblock %}
+{% block content %}
+
+{% for post in posts%}
+        <!-- Post -->
+        <article class="media content-section infinite-item">
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ post.user.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-2" href="{% url 'user-posts' post.user.username %}">{{ post.user }}</a>
+              <small class="text-muted">{{ post.date_posted|date:"F d, Y" }} </small>
+            </div>
+            <p class="mt-2">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Location: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{post.state}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="industry">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Industry: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{post.industry}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="field">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Field: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{post.field}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="job_type">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Job Type: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{post.job_type}}</li>
+                </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="qualification">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                    Qualification: </span><br>
+                    <ul style="margin-left: -15px; margin-top: -15px;">
+                        <li>{{post.education}}</li>
+                    </ul>
+            </p>
+            <hr>
+            <p class="mt-2" id="experience">
+                <span style="font-weight: 600; font-size: 1.0em;">
+                Experience Required: </span><br>
+                <ul style="margin-left: -15px; margin-top: -15px;">
+                <li>{{post.experience}}</li>
+                </ul>
+            </p>
+            <hr>
+            <div class="form-group">
+                <a class="btn btn-outline-danger btn-sm btn-block" style="color: red;" href="{% url 'request-delete' post.id %}" role="button" aria-pressed="true">
+                Delete Request</a>
+            </div>            
+          </div>          
+        </article>
+{%empty%}
+<div class="media content-section">
+    <h6>You Have No Job Request <a href="{%url 'request-job'%}" style="text-decoration: none;">Click Link To Make Job Request</a></h6>
+</div>        
+{%endfor%}
+{%endblock content%}
