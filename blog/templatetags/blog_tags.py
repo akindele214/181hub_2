@@ -13,6 +13,14 @@ register = template.Library()
 def class_name(value):
     return value.__class__.__name__
 
+@register.filter()
+def notification_class_name(value):
+    model = None
+    if value.action_object_content_type == None:
+        model = 'profile'
+    else:
+        model = value.action_object_content_type.model
+    return model
 
 @register.filter()
 @stringfilter

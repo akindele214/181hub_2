@@ -5,6 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from .forms import CreateJobForm, CreateShareForm, ShareJobEditForm, QuoteJobForm
 from django.contrib import messages
+from notifications.signals import notify
 # REST FRAMEWORK
 from rest_framework.views import APIView
 from rest_framework.response import Response

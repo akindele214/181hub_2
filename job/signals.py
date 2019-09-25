@@ -3,7 +3,8 @@ from django.dispatch import receiver
 from .models import RequestJob, JobOpening
 from blog.models import Post
 from django.contrib.auth.models import User
-
+from django.core.mail import EmailMessage, send_mail
+from notifications.signals import notify
 
 # @receiver(post_save, sender=JobOpening)
 # def after_job_create(sender, instance, created, **kwargs):
@@ -26,28 +27,23 @@ def after_job_create(sender, instance, created, **kwargs):
         print("JOb SAVED")
         for req in all_request:
             if req.field == instance.field:
-                accuracy += .1
-                print("State Match", accuracy)
+                accuracy += .1                
             else:
                 pass
             if req.industry == instance.industry:
-                accuracy += .1
-                print("Industry Match", accuracy)
+                accuracy += .1                
             else:
                 pass
             if req.job_type == instance.job_type:
-                accuracy += .1
-                print("Job Type Match", accuracy)
+                accuracy += .1                
             else:
                 pass
             if req.education == instance.education:
-                accuracy += .1
-                print("Education Match", accuracy)
+                accuracy += .1                
             else: 
                 pass
             if req.experience == instance.experience:
                 accuracy += .05
-                print('Experience Match', accuracy)
             else:
                 pass
             if req.state == instance.state:
@@ -56,6 +52,9 @@ def after_job_create(sender, instance, created, **kwargs):
                 pass                
             accuracy_percentage = int(accuracy/.5 * 100)
             if accuracy_percentage >=50:
+                notify.send(instance.user, recipient=req.user,
+                verb='a job that matches your request has been entered into the database', action_object=instance)
+                
                 print('A new job posted by',instance.user, 'matches', req.user.username+"'s", 'job request by', accuracy_percentage)
             accuracy = 0
 

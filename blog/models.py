@@ -136,7 +136,7 @@ class ShareTag(models.Model):
 class Quote(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     share_post = models.ForeignKey(Share, on_delete=models.CASCADE)
-    content = models.TextField(validators=[validate_is_profane])
+    content = models.TextField()
     image = models.ImageField(upload_to='quote_pic/', blank=True, null=True)
     date_posted = models.DateField(default=timezone.now)
     # objects = models.Manager() 

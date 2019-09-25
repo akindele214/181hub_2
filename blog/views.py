@@ -600,7 +600,7 @@ class ShareLikeAPIToggle(APIView):
                 obj.likes.add(user)
                 liked = True
                 if request.user != obj.user:
-                    notify.send(request.user, recipient=obj.user, verb='liked your post in a thread', action_object=obj.post,description=obj.content)
+                    notify.send(request.user, recipient=obj.user, verb='liked your post in a thread', action_object=obj,description=obj.content)
             updated = True
         data = {
             "updated": updated,
