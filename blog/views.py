@@ -1140,8 +1140,6 @@ class ShareReport(LoginRequiredMixin, CreateView):
         return render(request, 'blog/report_post.html', context)
 
 class QuoteShare(LoginRequiredMixin, CreateView):
-#    model = Quote
-#    fields = ['content', 'share', 'user']
     context_object_name = 'share'
 
     def get(self, request, *args, **kwargs):
@@ -1200,9 +1198,11 @@ class ShareView(LoginRequiredMixin, CreateView):
     context_object_name = 'post'
 
     def get(self, request, *args, **kwargs):
-        pk = kwargs['pk']
-        form = ShareForm()
+        pk = kwargs['pk']                
         post = get_object_or_404(Post, pk=pk)
+        share_username = '@'+post.user.username
+        initial_content = {'content': share_username}
+        form = ShareForm(initial=initial_content)
         context = {
             'form': form,
             'post': post,

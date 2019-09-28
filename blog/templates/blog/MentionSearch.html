@@ -52,7 +52,7 @@
               <span class="badge badge-secondary ml-2"><small>AUD</small></span>
                   {% endif %}
             </h5>
-            <p class="article-content">{{ post.content|truncatewords:"50"|hashtag_links|mention_link }}
+            <p class="article-content" style="white-space:normal;">{{ post.content|truncatewords:"50"|hashtag_links|mention_link }}
             
               {% ifnotequal post.content|truncatewords:"50"|length post.content|truncatewords:"51"|length %}
               <a href="{% url 'post-detail' post.pk %}" class="mt-0" >read more</a>
