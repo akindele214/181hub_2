@@ -165,7 +165,7 @@ class JobOpening(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     job_title = models.CharField(max_length=140)
-    job_summary = models.TextField()
+    company_description = models.TextField()
     job_description = models.TextField()
     company_name = models.CharField(max_length=140)
     saved = models.ManyToManyField(User, related_name='saved_job', blank=True)

@@ -1,4 +1,5 @@
 {% extends 'blog/base.html' %}
+{% block title %}Notifications - {{block.super}}{%endblock %}
 {% load blog_tags %}
 {% block content %}
 {% comment %} <ul class="notifications">
@@ -6,7 +7,6 @@
     {% include 'notifications/notice.html' %}
   {% endfor %}
 </ul> {% endcomment %}
-{{notify.count}}
 {% for notice in notify %}
 {% with notice|notification_class_name as class %}
 {% if class == 'post' %}
@@ -29,7 +29,10 @@
 
            <p>
             {% if notice.verb == 'mentioned you in a post' %}
-            <small class="text-muted" style="float: left;"><a href="{% url 'share_post' pk=notice.action_object.id %}" class="text-muted"><i class="fas fa-exchange-alt fa-lg"></i></a></small>
+            <small class="text-muted" style="float: left;">
+            <a href="{% url 'share_post' pk=notice.action_object.id %}" class="text-muted">
+            <i class="fas fa-exchange-alt fa-lg"></i>
+            </a></small>
             {% endif %}
             <small class="text-muted" style="float: right;">{{ notice.timesince|upto:','  }} ago</small>
           </p>
@@ -57,8 +60,12 @@
             {% endif %}
 
            <p>
-            {% if notice.verb == "mentioned you in a post thread" %}
-            <small class="text-muted" style="float: left;"><a href="{% url 'quote-share' notice.action_object.id %}" class="text-muted"><i class="fas fa-exchange-alt fa-lg"></i></a></small>
+            {% if notice.verb == 'mentioned you in a post thread' %}
+            <small class="text-muted" style="float: left;">
+            <a href="{% url 'quote-share' notice.action_object.id %}" class="text-muted">
+            <i class="fas fa-exchange-alt fa-lg"></i>
+            </a>
+            </small>
             {% endif %}
             <small class="text-muted" style="float: right;">{{ notice.timesince|upto:','  }} ago</small>
           </p>
@@ -79,6 +86,52 @@
 </p>
 </div>
 </article>
+{% elif class == 'jobopening'%}
+    <article class="media content-section"> 
+          <div class="media-body">
+            <div class="article-metadata">
+              <img src="{{ notice.actor.profile.image.url }}" class="rounded-circle article-img mb-1">
+              <a class="mr-1" href="{% url 'user-posts' notice.actor.username %}">{{ notice.actor }}{% if notice.actor.profile.verified %} <i class="far fa-check-circle fa-sm"></i>{%endif%}</a>
+              <small class="text-muted">{{notice.verb}} </small> 
+            </div>
+            <h5><a class="article-title" href="{% url 'job-detail' notice.action_object.pk %}">{{ notice.action_object.job_title }}</a> <span class="badge badge-pill badge-secondary ml-2">{{notice.action_object.job_type}}</span></h5>
+              <p class="article-content" style="white-space:normal;">{{ notice.action_object.job_summary|truncatewords:"31"|hashtag_links|mention_link|urlize }}              
+                {% ifnotequal notice.action_object.job_summary|truncatewords:"30"|length notice.action_object.job_summary|truncatewords:"31"|length %}
+                <a href="{% url 'job-detail' notice.action_object.pk %}" class="mt-0" >read more</a>
+                {% endifnotequal %}
+              </p>                       
+              
+              <p class="mt-2">
+              <small class="text-muted" style="float: left;">
+                <i class="fas fa-map-marker-alt fa-lg"></i> {{notice.action_object.state}}&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="far fa-building fa-lg"></i> {{notice.action_object.company_name}}&nbsp;&nbsp;&nbsp;
+                <!--Post Like-->
+                {%if request.user.is_authenticated%}
+                {% comment %} 
+                  {% if request.user in post.likes.all%}
+                  <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                  <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                  {%else%}
+                  <a class="like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                  <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                  {% endif %}          
+                  <a href="{% url 'share_post' pk=post.id %}" class="text-muted"><i class="fas fa-exchange-alt ml-3 fa-lg"></i></a> 
+                {% endcomment %}
+                {% if request.user in notice.action_object.saved.all %}
+                <a class="save-job-btn" href="{{notice.action_object.get_save_job_url}}" data-href="{{notice.action_object.get_api_save_job_url}}" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-2" id="save"></i>&nbsp; Unsave Job
+                </a>
+                {% else %}
+                <a class="save-job-btn" href="{{notice.action_object.get_save_job_url}}" data-href="{{notice.action_object.get_api_save_job_url}}" data-toggle="tooltip" title="Save Job" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-2" id="save" ></i>&nbsp; Save Job
+                </a>
+                {% endif %}      
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted ml-2" style="float: right; font-size: 1em;">log in to save and share post</small></a>
+                {%endif%}
+              </small>
+              </p>
+
+          </div>
+    </article>
 {%endif%}
 
 {%endwith%}

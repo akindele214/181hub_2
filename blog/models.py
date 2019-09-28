@@ -87,7 +87,7 @@ class Comment(models.Model):
 class Share(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    content = models.TextField(validators=[validate_is_profane], null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name='share_likes', blank=True)
     image = models.ImageField(upload_to='shared_pic/', blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)

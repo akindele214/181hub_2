@@ -51,10 +51,19 @@ def after_job_create(sender, instance, created, **kwargs):
             else:
                 pass                
             accuracy_percentage = int(accuracy/.5 * 100)
-            if accuracy_percentage >=50:
+            if accuracy_percentage >=50 and req.user != instance.user:
+                subject = 'Job Request Match'
+                body  = '{} posted a job that matches your request by {}{}, click the link to check it out https://181hub.com/job/{}/detail . Regards'.format(str(instance.user.username), str(accuracy_percentage),'%', str(instance.pk))
+                print(subject, body)
                 notify.send(instance.user, recipient=req.user,
-                verb='a job that matches your request has been entered into the database', action_object=instance)
-                
+                            verb="posted a job that matches your request by {}{}".format(accuracy_percentage,"%"), 
+                            action_object=instance)
+                email = send_mail(
+                'Job Request Notification', 
+                body,
+                '181hub@gmail.com',
+                [req.user.email],
+                fail_silently= True)                
                 print('A new job posted by',instance.user, 'matches', req.user.username+"'s", 'job request by', accuracy_percentage)
             accuracy = 0
 

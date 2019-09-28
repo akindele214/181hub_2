@@ -69,7 +69,7 @@ class CreateJobForm(forms.ModelForm):
         fields = (
             'job_title',
             'job_description',
-            'job_summary',
+            'company_description',
             'company_name',
             'job_type',
             'education',

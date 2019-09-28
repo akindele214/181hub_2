@@ -1146,8 +1146,10 @@ class QuoteShare(LoginRequiredMixin, CreateView):
 
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk']
-        form = QuoteForm()
-        share_post = get_object_or_404(Share, pk=pk)
+        share_post = get_object_or_404(Share, pk=pk)        
+        share_username = '@'+share_post.user.username
+        initial_content = {'content': share_username}
+        form = QuoteForm(initial=initial_content)
         context = {
             'form': form,
             'share_post': share_post, 
@@ -1175,8 +1177,9 @@ class QuoteShare(LoginRequiredMixin, CreateView):
                     if word.startswith("@"):
                         w = word.replace('@', '')
                         if User.objects.get(username__iexact=w):
-                            notify.send(request.user, recipient=User.objects.get(username__iexact=w),
-                                        verb='mentioned you in a post thread', action_object=share_post.post, description=content)
+                                if request.user != User.objects.get(username__iexact=w):
+                                    notify.send(request.user, recipient=User.objects.get(username__iexact=w),
+                                        verb='mentioned you in a post thread', action_object=quote_create, description=content)
                         else:
                             pass
             messages.success(request, f'Done')
@@ -1228,7 +1231,7 @@ class ShareView(LoginRequiredMixin, CreateView):
                         w = word.replace('@', '')
                         if User.objects.get(username__iexact=w): 
                             notify.send(request.user, recipient=User.objects.get(username__iexact=w),
-                                        verb='mentioned you in a post thread', action_object=post, description=content)
+                                        verb='mentioned you in a post thread', action_object=share_create, description=content)
                         else:
                             pass
             messages.success(request, f'Post Shared')

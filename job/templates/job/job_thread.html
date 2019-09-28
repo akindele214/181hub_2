@@ -11,8 +11,8 @@
               <small class="text-muted">{{ ori_post.date_posted|timesince|upto:','  }} ago</small>
             </div>
             <h5><a class="article-title" href="{% url 'job-detail' ori_post.pk %}">{{ ori_post.job_title }}</a> <span class="badge badge-pill badge-secondary ml-2">{{ori_post.job_type}}</span></h5>
-              <p class="article-content" style="white-space:normal;">{{ ori_post.job_summary|truncatewords:"31"|hashtag_links|mention_link|urlize }}              
-                {% ifnotequal ori_post.job_summary|truncatewords:"30"|length ori_post.job_summary|truncatewords:"31"|length %}
+              <p class="article-content" style="white-space:normal;">{{ ori_post.company_description|truncatewords:"31"|hashtag_links|mention_link|urlize }}              
+                {% ifnotequal ori_post.company_description|truncatewords:"30"|length ori_post.company_description|truncatewords:"31"|length %}
                 <a href="{% url 'job-detail' ori_post.pk %}" class="mt-0" >read more</a>
                 {% endifnotequal %}
               </p>                          

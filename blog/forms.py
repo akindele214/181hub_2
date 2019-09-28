@@ -86,9 +86,9 @@ class QuoteForm(forms.ModelForm):
         model = Share 
         fields = ['content', 'image']
     
-    def __init__(self, *args, **kwargs):
-        super(QuoteForm, self).__init__(*args, **kwargs)
-        self.fields['content'].required = False
+    # def __init__(self, *args, **kwargs):
+    #     super(QuoteForm, self).__init__(*args, **kwargs)
+    #     self.fields['content'].required = False
 
 
 class ShareEditForm(forms.ModelForm):

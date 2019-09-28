@@ -6,6 +6,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from .forms import CreateJobForm, CreateShareForm, ShareJobEditForm, QuoteJobForm
 from django.contrib import messages
 from notifications.signals import notify
+from notifications.models import Notification
 # REST FRAMEWORK
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -49,7 +50,7 @@ class CreateJobOpening(LoginRequiredMixin, CreateView):
                 education = form.cleaned_data['education']
                 industry = form.cleaned_data['industry']
                 job_description = form.cleaned_data['job_description']
-                job_summary = form.cleaned_data['job_summary']
+                company_description = form.cleaned_data['company_description']
                 send_cv_directly = form.cleaned_data['send_cv_directly']
                 experience = form.cleaned_data['experience']
                 job_type = form.cleaned_data['job_type']
@@ -59,7 +60,7 @@ class CreateJobOpening(LoginRequiredMixin, CreateView):
                 job_create =  JobOpening.objects.create(user= request.user, 
                                                         job_title= job_title, 
                                                         job_description= job_description, 
-                                                        job_summary= job_summary,
+                                                        company_description= company_description,
                                                         company_name=company_name,
                                                         industry= industry, 
                                                         field= field, 
@@ -122,7 +123,7 @@ class JobUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     fields = [
               'job_title',
               'job_description',
-              'job_summary',
+              'company_description',
               'company_name',
               'job_type',
               'education',
@@ -157,10 +158,15 @@ class DeleteJobView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return False
 
     def delete(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        user = self.object.user
-        # success_url = self.get_success_url()
-        self.object.delete()
+        post = self.get_object()
+        user = post.user
+        notifications = Notification.objects.filter(action_object_content_type__model= 'jobopening', action_object_object_id=post.pk)
+        for notification in notifications.all():
+            if int(notification.action_object_object_id) == post.id:
+                notification.delete()
+            else:
+                pass
+        post.delete()
         return redirect('all_jobs')
 
 class SaveJobToggle(LoginRequiredMixin, RedirectView):
@@ -350,6 +356,9 @@ class DeleteShareJob(LoginRequiredMixin, UserPassesTestMixin, DeleteView, Redire
         if self.request.user == share.user:
             return True
         return False
+    
+    # def delete(self):
+
 
     def get_success_url(self):
         return reverse('job-thread', kwargs={'pk': self.object.job.pk})
@@ -411,7 +420,7 @@ class LikeShareApiToggle(APIView):
             else:
                 obj.likes.add(user)
                 liked = True
-                # if request.user != obj.user:
+                # sif request.user != obj.user:
                 #     notify.send(request.user, recipient=obj.user, verb='liked your post in a thread', action_object=obj.post,description=obj.content)
             updated = True
         data = {

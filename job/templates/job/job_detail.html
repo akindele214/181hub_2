@@ -82,8 +82,8 @@ jQuery(document).ready(function($) {
             <h5 class="article-title">{{ object.job_title }}</h5>
             <p class="mt-2 mb-3">
                 <span style="font-weight: 600; font-size: 1.0em;">
-                Job Summary: </span><br>
-                {{ object.job_summary|hashtag_links|mention_link|urlize }}        
+                About The Company: </span><br>
+                {{ object.company_description|hashtag_links|mention_link|urlize }}        
             </p>
             
             <p class="mt-2">
