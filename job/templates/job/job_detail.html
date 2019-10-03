@@ -4,7 +4,8 @@
 {% load blog_tags %}
 {% load hitcount_tags %}
 {% load staticfiles %}
-{% get_hit_count_js_variables for object as hitcount %}
+
+{% comment %} {% get_hit_count_js_variables for object as hitcount %}
 {% get_hit_count for object as total_hits %}
 
 <script src="{% static 'hitcount/jquery.postcsrf.js' %}"></script>
@@ -22,9 +23,10 @@ jQuery(document).ready(function($) {
       console.log(data);
   });
 });
-</script>
+</script> {% endcomment %}
 
 {% block content %}
+{% comment %} 
 {% get_hit_count_js_variables for object as hitcount %}
 {% get_hit_count for object as object_hits %}
 <script src="{% static 'hitcount/jquery.postcsrf.js' %}"></script>
@@ -40,7 +42,8 @@ jQuery(document).ready(function($) {
       console.log(data);
   });
 });
-</script>
+</script> 
+{% endcomment %}
         <article class="media content-section">
           <div class="media-body">
             <div class="article-metadata">
@@ -119,7 +122,7 @@ jQuery(document).ready(function($) {
                 </ul>
             </p>
             <hr>
-            <p class="mt-2" id="job_description">
+            <p class="mt-2 article-content" id="job_description">
                 <span style="font-weight: 600; font-size: 1.0em;">
                 Job Description: </span><br>
                 {{object.job_description}}
@@ -220,7 +223,7 @@ jQuery(document).ready(function($) {
             </a>
             {% endif %}
             {%else%}
-            <a href="{%url 'login'%}"><small class="text-muted" style="float: left;">log in to like and share post</small></a>
+            <a href="{%url 'login'%}"><small class="text-muted" style="float: left;">log in to save and share post</small></a>
             <br>
             {%endif%}
             </small>

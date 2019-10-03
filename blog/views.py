@@ -243,7 +243,6 @@ class MentionSearchView(ListView):
             pass
 '''
 
-
 class MentionSearchView(ListView):
     # model = Post
     # template_name = 'blog/user_posts.html'  # <app>/<model>_<viewtype>.html
@@ -352,7 +351,7 @@ class PostDetailView(PostMixinDetailView, HitCountDetailView):
             'is_liked': is_liked,
             'total_likes': post.total_likes(),
             'comments': comments,
-            'comment_form': comment_form,
+            # 'comment_form': comment_form,
             'is_saved': is_saved,
 
         }
@@ -397,7 +396,7 @@ class PostDetailView(PostMixinDetailView, HitCountDetailView):
             'is_liked': is_liked,
             'total_likes': post.total_likes(),
             'comments': comments,
-            'comment_form': comment_form,
+            # 'comment_form': comment_form,
             'is_saved': is_saved,
         }
         if request.is_ajax():

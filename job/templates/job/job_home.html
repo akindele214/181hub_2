@@ -2,6 +2,16 @@
 {% load blog_tags %}
 {% block title %}Jobs - {{block.super}}{%endblock%}
 {% block content %}
+<article class="media content-section">
+  <div class="media-body text-center">
+    <a style="text-decoration: none; color: white; font-size: 15px;" href="{% url 'request-job' %}" class="badge badge-pill badge-secondary ml-2">Request For A Job</a>
+    
+    <a style="text-decoration: none; color: white; font-size: 15px;" href="{% url 'new_job' %}" class="badge badge-pill badge-secondary ml-2">Post Job Vacancy</a>
+    {% if request.user.is_authenticated %}
+    <a style="text-decoration: none; color: white; font-size: 15px;" href="{% url 'request-list' %}" class="badge badge-pill badge-secondary ml-2">Job Request List</a>
+    {%endif%}
+  </div>
+</article>
 {% for post in posts  %}
     <article class="media content-section"> 
           <div class="media-body">

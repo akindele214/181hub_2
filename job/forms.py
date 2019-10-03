@@ -61,15 +61,15 @@ class CreateJobForm(forms.ModelForm):
     # education = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, choices=EDUCATION_CHOICES)
     job_description = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
     method_of_application = forms.CharField(widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': '', 'rows': '8', 'cols': '30'}))
-    send_cv_directly = forms.BooleanField(label="Click if You'd Like Applicants to Send CV Directly",required=False)
+    # send_cv_directly = forms.BooleanField(label="Click if You'd Like Applicants to Send CV Directly",required=False)
     company_email = forms.EmailField(widget=forms.TextInput(attrs={'type': 'email','placeholder': "Enter An Email An Applicant Can Send An Application To."}))
 
     class Meta:
         model = JobOpening
         fields = (
             'job_title',
-            'job_description',
             'company_description',
+            'job_description',
             'company_name',
             'job_type',
             'education',
@@ -79,7 +79,7 @@ class CreateJobForm(forms.ModelForm):
             'company_email',
             'experience',
             'method_of_application',
-            'send_cv_directly',
+            # 'send_cv_directly',
         )
 
 

@@ -277,7 +277,8 @@ class ShareJobUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView, Re
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk']
         share = ShareJob.objects.get(pk=pk)
-        form = ShareJobEditForm(instance=share)
+        share_username = '@'+share.user.username
+        form = ShareJobEditForm(instance=share, initial={'content': share_username})
         context = {
             'form': form,
             'post': share,
@@ -478,7 +479,6 @@ class QuoteJobShare(LoginRequiredMixin, CreateView):
             'share_post': share_post
         }
         return render(request, 'blog/quote.html', context)
-
 
 class RequestJobCreateView(LoginRequiredMixin, SuccessMessageMixin, CreateView):
     model = RequestJob

@@ -19,7 +19,7 @@
               <span class="badge badge-secondary ml-2">IMG</span>
                   {% endif %}</h5>
               <p class="article-content">{{ ori_post.content|truncatewords:"70"|hashtag_links  }}</p>
-              <small class="text-muted" style="float: right;">{{ ori_post.date_posted|timesince|upto:','  }} ago </small>
+              <small class="text-muted" style="float: right;">{{ ori_post.date_posted|timesince  }} ago </small>
           </div>
         </article>
           {% for post in shares %}

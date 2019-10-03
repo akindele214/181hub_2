@@ -13,7 +13,7 @@ SECRET_KEY = 'k++ljsenmj!r3wj$_j^ry7fmkr=-lullj$b756%%h9ck1=)3o5'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1','134.209.169.204', 'localhost', '181hub.com', 'www.181hub.com']
+ALLOWED_HOSTS = ['127.0.0.1','134.209.169.204', 'localhost', '181hub.com', 'www.181hub.com', '169.254.233.117']
 
 # Application definition
 

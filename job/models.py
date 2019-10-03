@@ -170,7 +170,7 @@ class JobOpening(models.Model):
     company_name = models.CharField(max_length=140)
     saved = models.ManyToManyField(User, related_name='saved_job', blank=True)
     job_type = models.CharField(choices=JOB_TYPE_CHOICES, max_length=30)
-    company_email = models.EmailField(max_length=254)
+    company_email = models.EmailField(max_length=254, blank=True, null=True)
     method_of_application = models.TextField(blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)
     experience = models.CharField(choices=EXPERIENCE_CHOICES, max_length=20)
@@ -197,7 +197,7 @@ class JobOpening(models.Model):
 class ShareJob(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     job = models.ForeignKey(JobOpening, on_delete=models.CASCADE)
-    content = models.TextField(validators=[validate_is_profane], null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
     likes = models.ManyToManyField(User, related_name='share_job_likes', blank=True)
     image = models.ImageField(upload_to='shared_pic/', blank=True, null=True)
     date_posted = models.DateTimeField(default=timezone.now)

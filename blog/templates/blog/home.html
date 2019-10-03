@@ -218,7 +218,7 @@
               <span class="badge badge-secondary ml-2"><small>AUD</small></span>
                   {% endif %} {% endcomment %}
             </h5>
-              <p class="article-content" style="white-space: normal;">{{ post.job.job_summary|truncatewords:"20"|urlize}}
+              <p class="article-content" style="white-space: normal;">{{ post.job.job_description|truncatewords:"20"|urlize}}
               {% ifnotequal post.job.job_description|truncatewords:"20"|length post.job.job_description|truncatewords:"21"|length %}
               <a href="{% url 'job-detail' post.job.pk %}" class="mt-0" >read more</a>
               {% endifnotequal %}
