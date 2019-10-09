@@ -111,3 +111,12 @@ class UserEmailRequest(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.sender,self.receiver)
+
+
+class Suggestion_Report(models.Model):
+    date = models.DateField(default = timezone.now)
+    content = models.TextField()
+
+    def __str__(self):
+        return '{} - {}'.format(self.date, self.content)
+

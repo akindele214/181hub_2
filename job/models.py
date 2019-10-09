@@ -13,7 +13,8 @@ class JobManager(models.Manager):
         if query is not None:
             or_lookup = (Q(job_title__icontains=query)|
                          Q(job_description__icontains=query)|
-                         Q(job_summary__icontains=query)
+                         Q(company_description__icontains=query)|
+                         Q(company_name__icontains=query)
                         )
             qs = qs.filter(or_lookup).distinct() # distinct() is often necessary with Q lookups
         return qs

@@ -1144,7 +1144,7 @@ class QuoteShare(LoginRequiredMixin, CreateView):
     def get(self, request, *args, **kwargs):
         pk = kwargs['pk']
         share_post = get_object_or_404(Share, pk=pk)        
-        share_username = '@'+share_post.user.username
+        share_username = '@'+share_post.user.username+' '
         initial_content = {'content': share_username}
         form = QuoteForm(initial=initial_content)
         context = {

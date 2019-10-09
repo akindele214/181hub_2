@@ -44,6 +44,7 @@ from . import views
 import notifications.urls
 import hitcount.urls
 from django.conf.urls import url
+from user.views import CreateSuggestion
 
 urlpatterns = [
     # POST
@@ -56,6 +57,7 @@ urlpatterns = [
     path('post/new/', CreatePostView.as_view(), name='post-create'),
     path('create/', CreatePostView.as_view(), name='create-post'),
     path('like/', like_post, name='like_post'),
+    path('suggestion/', CreateSuggestion.as_view(), name='suggest'),
     
     path('post/<int:pk>/like/', PostLikeToggle.as_view(), name='like-toggle'),
     path('api/post/<int:pk>/like/', PostLikeAPIToggle.as_view(), name='like-api-toggle'),

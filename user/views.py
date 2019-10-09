@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect, HttpRequest, Http404, HttpResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods,require_safe
 from .forms import UserRegisterForm, UserUpdateForm, ProfileUpdateForm, MonetizeForm
-from .models import Profile, Monetization, UserEmailRequest
+from .models import Profile, Monetization, UserEmailRequest, Suggestion_Report
 from django.contrib.auth.models import User
 from blog.models import Post
 from django.contrib.auth.decorators import user_passes_test
@@ -20,6 +20,7 @@ from django.core.mail import EmailMessage, send_mail
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import authentication, permissions
+from django.views.generic import ListView, View, CreateView
 
 # Create your views here.
 
@@ -265,3 +266,15 @@ def emailrequestconfirm(request, user_id,uuid):
     except UserEmailRequest.DoesNotExist:
         messages.warning(request, f'Invalid Request')
         return redirect('blog-home')
+
+
+class CreateSuggestion(CreateView):
+    model = Suggestion_Report
+    fields = ['content']
+    template_name = 'user/report.html'
+    success_url = '/'
+
+    def form_valid(self, form):
+        form.instance.content = self.request.POST['content']
+        return super().form_valid(form)
+
