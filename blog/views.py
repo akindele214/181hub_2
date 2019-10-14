@@ -130,7 +130,9 @@ class PostListView(ListView):
             date = timedelta(days=8)
             last_week = timezone.now() - date
             posts = Post.objects.all().exclude(date_posted__lt=last_week).order_by('?')
-            return posts
+            jobs = JobOpening.objects.all().order_by('-date_posted')
+            chain_ = chain(posts, jobs)
+            return sorted(chain_, key= lambda x: x.date_posted, reverse= True)
 
 class Trending(ListView):
     context_object_name = 'posts'
