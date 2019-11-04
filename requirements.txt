@@ -104,7 +104,7 @@ user-agents==2.0
 virtualenv==16.4.3
 w3lib==1.20.0
 websocket-client==0.56.0
-Werkzeug==0.15.2
+Werkzeug==0.15.3
 whitenoise==3.3.1
 wrapt==1.10.11
 yarg==0.1.9
