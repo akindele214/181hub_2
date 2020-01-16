@@ -6,8 +6,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 import notifications.urls
 from django.conf.urls import url
-from chat import views as chat_views
-from chat.views import ChatReport
+# from chat import views as chat_views
+# from chat.views import ChatReport
 
 
 urlpatterns = [
@@ -18,6 +18,7 @@ urlpatterns = [
     path('live_counter/', user_views.live_counter, name='live_counter'),
     path('', include('blog.urls')),
     path('jobs/', include('job.urls')),
+    path('shop/', include('shop.urls')),
     path('emoji/', include('emoji.urls')),
     url(r'^accounts/', include('allauth.urls')),
     path('register/', user_views.register, name='register'),
@@ -30,14 +31,17 @@ urlpatterns = [
     path('profile/', user_views.profile, name='profile'),
     path('wallet/', user_views.wallet, name='wallet'),
     path('monetize/', user_views.monetize, name='monetize'),
-    path('chat/', include('chat.urls')),
-    path('directmessage/<int:receivers_id>/', chat_views.load_chat, name='message'),
-    path('room/<int:room_name>/', chat_views.dm, name='dm'),
-    path('<str:room_name>/', chat_views.room, name='room'),
-    path('request/unaccepted/', chat_views.unaccepted_messages, name='unaccepted_messages'),
-    path('room/messages/', chat_views.messages, name='messenger'),
-    path('reportchat/<int:chat_id>', ChatReport.as_view(), name='report_chat'),
-    path('room/delete/<int:chat_id>/', chat_views.delete_chat, name='delete_chat'),
+
+    # CHAT
+    # path('chat/', include('chat.urls')),
+    # path('directmessage/<int:receivers_id>/', chat_views.load_chat, name='message'),
+    # path('room/<int:room_name>/', chat_views.dm, name='dm'),
+    # path('<str:room_name>/', chat_views.room, name='room'),
+    # path('request/unaccepted/', chat_views.unaccepted_messages, name='unaccepted_messages'),
+    # path('room/messages/', chat_views.messages, name='messenger'),
+    # path('reportchat/<int:chat_id>', ChatReport.as_view(), name='report_chat'),
+    # path('room/delete/<int:chat_id>/', chat_views.delete_chat, name='delete_chat'),
+
     path('emailrequest/<int:user_id>/', user_views.useremailrequest, name='email_request'),
     path('emailrequest/<int:user_id>/<str:uuid>/confirm/', user_views.emailrequestconfirm, name='email_request_confirm'),
 ]

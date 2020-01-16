@@ -260,15 +260,70 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if request.user.is_authenticated %}
-                <a class="nav-item nav-link" href="{% url 'post-create' %}">New Post</a>
-                <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a>
-                <a class="nav-item nav-link" href="{% url 'messenger' %}">Messages</a> 
+              <!-- Navbar Dropdown-->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Blog
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{% url 'post-create'%}">New Post</a>
+                  <a class="dropdown-item" href="{% url 'user-posts' request.user.username %}">My Posts</a>
+                  <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
+                  <div class="dropdown-divider"></div>
+                  {% comment %} <a class="dropdown-item" href="#">Something else here</a> {% endcomment %}
+                </div>
+              </li>
+
+              
+
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Shop
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{% url 'post-ad'%}">Post Ad</a>
+                  <a class="dropdown-item" href="#">My Ads</a>
+                  <a class="dropdown-item" href="{% url 'all-ads' %}">All Ads</a>
+                  <div class="dropdown-divider"></div>
+                  {% comment %} 
+                  <a class="dropdown-item" href="#">Something else here</a> {% endcomment %}
+                </div>
+              </li>
+                {% comment %} <a class="nav-item nav-link" href="{% url 'post-create' %}">New Post</a>
+                <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a> {% endcomment %}
+
+                {% comment %} <a class="nav-item nav-link" href="{% url 'messenger' %}">Messages</a>  {% endcomment %}
                 
                 <a class="nav-item nav-link" href="{% url 'notifications:mark_all_as_read' %}">Notifications({% live_notify_badge %})</a>
               {% else %}
                 <a class="nav-item nav-link" href="{% url 'login' %}">Login</a>
                 <a class="nav-item nav-link" href="{% url 'register' %}">Register</a>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Shop
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="{% url 'post-ad'%}">Post Ad</a>
+                    <a class="dropdown-item" href="#">My Ads</a>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                  </div>
+                </li>
               {% endif %}
+
+              {% comment %} <!-- Navbar Dropdown-->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Shop
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{% url 'post-ad'%}">Post Ad</a>
+                  <a class="dropdown-item" href="#">My Ads</a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#">Something else here</a>
+                </div>
+              </li> {% endcomment %}
+
             </div>
           </div>
         </div>

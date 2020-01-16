@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'emoji',
     'chat',
     'job',
+    'shop',
     'channels',
     # 'notify',
     'rest_framework',
@@ -92,6 +93,16 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# CHANNEL_LAYERS = {
+#     'default': {
+#         'BACKEND': 'channels_redis.core.RedisChannelLayer',
+#         'CONFIG': {
+#             "hosts": [CHANNEL_REDIS_HOST],
+#             "symmetric_encryption_keys": [SECRET_KEY],
+#         },
+#     },
+# }
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

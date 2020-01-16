@@ -34,6 +34,7 @@ class Post(models.Model, HitCountMixin):
     likes = models.ManyToManyField(User, related_name='likes', blank=True)
     date_posted = models.DateTimeField(default=timezone.now)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    # image = models.ImageField(upload_to='post_pics/', blank=True, null=True)
     video = models.FileField(upload_to='uploads/', blank=True, null=True, validators=[FileExtensionValidator(["mp4"])])
     audio = models.FileField(upload_to='audio/', blank=True, null=True, validators=[FileExtensionValidator(["mp3"])])
     restrict_comment = models.BooleanField(default=False)

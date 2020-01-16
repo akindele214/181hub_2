@@ -23,6 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from user.models import Profile
 from job.models import JobOpening, ShareJob
+
 # REST FRAMEWORK
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -905,7 +906,7 @@ class CreatePostView(LoginRequiredMixin, View):
         if request.method == 'POST':
             form = PostCreateForm(request.POST, request.FILES or None)
             formset = ImageFormset(request.POST or None, request.FILES or None)
-
+            # print(formset)
             if form.is_valid() and formset.is_valid():
                 post = form.save(commit=False)
                 post.user = request.user
@@ -928,11 +929,12 @@ class CreatePostView(LoginRequiredMixin, View):
                             pass
 
                 for f in formset:
+                    print(f.clean, '\n')
                     try:
                         photo = Images(post=post, image=f.cleaned_data['image'])
                         photo.save()
                     except Exception as e:
-                        break
+                        pass
                 return redirect('blog-home')
         else:
             form = PostCreateForm()

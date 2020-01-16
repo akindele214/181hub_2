@@ -1,0 +1,37 @@
+{% extends 'blog/base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+    <div class="content-section">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">
+                   Post Your Ad
+                </legend>
+                {{ form|crispy }}
+                {% comment %} {{ vidform|crispy }} {% endcomment %}
+                {{ formset|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-info btn-md btn-block" type="submit">Post</button>
+            </div>
+        </form>
+    </div>
+    <script type="text/javascript">
+  var uploadField = document.getElementById("id_video");
+  
+uploadField.onchange = function() {
+    if(this.files[0].size > 52428800 ){
+       alert("File exceeds 50MB!");
+       this.value = "";
+    };
+};
+ var uploadMp = document.getElementById('id_audio')
+ uploadMp.onchange = function () {
+     if(this.files[0].size > 9437184){
+         alert("File exceeds 9 MB!");
+         this.value = "";
+     }
+ }
+</script>
+{% endblock content %}
