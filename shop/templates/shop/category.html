@@ -1,6 +1,6 @@
 {% extends 'blog/base.html' %}
 {% load blog_tags %}
-{% block title %}Ads - {{block.super}}{%endblock%}
+{% block title %}{{category}} Ads - {{block.super}}{%endblock%}
 {% block content %}
     <div class='card mb-4'>
       <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
@@ -17,8 +17,9 @@
         </div>
       </div>
     </div>
+
     <div class="media content-section">
-        <h6>All Ads</h6>
+        <h6>{{category}} Ads</h6>
     </div>
     {% for post in posts %}
         {% with post|class_name as class %}

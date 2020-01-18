@@ -1,0 +1,44 @@
+<div class="modal fade" id="product_view{{ post.pk }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">{{ post.prod_name }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hdden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      <div class="container col-sm-12 text-center">
+       <div id="carouselExampleControls{{ post.pk }}" class="row justify-content-md-center carousel slide mb-4" data-ride="carousel" data-interval="false">
+      <div class="carousel-inner">
+        {% for p in post.productimage_set.all %}
+        <div {% if forloop.first %} class="carousel-item active" {% else %} class="carousel-item" {% endif %}>
+            <img src="{{p.image.url}}" class="img-fluid rounded" alt="...">
+        </div>
+        
+        {%endfor%}
+      </div>
+      {% if post.productimage_set.count > 1 %}
+        <a class="carousel-control-prev" href="#carouselExampleControls{{ post.pk }}" role="button" data-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true" style="color: #5f788a;"></span>
+        <span class="sr-only" style="color: #5f788a;">Previous</span>
+      </a>
+      <a class="carousel-control-next" href="#carouselExampleControls{{ post.pk }}" role="button" data-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="sr-only">Next</span>
+      </a>
+      {%endif%}
+
+      </div>
+      </div>
+      <hr>
+      <p class="card-text"><b>Ad Description:</b> {{post.prod_details}}</p>
+      <p class="card-text">Price: {{post.prod_price}}</p>
+      <p class="card-text">Contact: {{post.phone_number}}</p>
+     </div>
+     <div class="modal-footer">
+        <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>

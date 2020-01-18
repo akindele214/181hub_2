@@ -23,6 +23,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from user.models import Profile
 from job.models import JobOpening, ShareJob
+from shop.models import Product
 
 # REST FRAMEWORK
 from rest_framework.views import APIView
@@ -79,6 +80,7 @@ class PostListView(ListView):
         user_final_hashtag = []
         final_hash_post = []
         final_post = []
+        final_ad = []
 
         if self.request.user.is_authenticated:
             user_id = self.request.user.id
@@ -124,7 +126,9 @@ class PostListView(ListView):
             logged_in_user_shared_post = Share.objects.filter(user__exact=self.request.user.id)
             logged_in_user_shared_job_post = ShareJob.objects.filter(user__exact=self.request.user.id)
             # print(logged_in_user_shared_job_post)
-            chain_qs = chain(posts, view_user_post, shared_post, logged_in_user_shared_post, final_hash_post, logged_in_user_shared_job_post, shared_job)
+            ads = Product.objects.all()
+            chain_qs = chain(posts, view_user_post, shared_post, logged_in_user_shared_post,
+                             final_hash_post, logged_in_user_shared_job_post, shared_job, ads)
             return sorted(chain_qs, key=lambda x: x.date_posted, reverse=True)
 
         else:
@@ -134,6 +138,7 @@ class PostListView(ListView):
             jobs = JobOpening.objects.all().order_by('-date_posted')
             chain_ = chain(posts, jobs)
             return sorted(chain_, key= lambda x: x.date_posted, reverse= True)
+
 
 class Trending(ListView):
     context_object_name = 'posts'

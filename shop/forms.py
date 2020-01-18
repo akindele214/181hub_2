@@ -20,7 +20,7 @@ class ProductCreateForm(forms.ModelForm):
     prod_details = forms.CharField(label="", widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Item Description', 'rows': '4', 'cols': '30'}))
     prod_price = forms.CharField(label="", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Price'}))
     prod_location = forms.CharField(label="", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Item Location'}))
-    phone_number = forms.CharField(label="", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number'}), required=False)
+    phone_number = forms.CharField(label="", widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Phone Number'}), required=True)
     prod_category = forms.ChoiceField(label='Item Category', initial='', widget=forms.Select(), choices=CATEGORY_CHOICES ,required=True)
     #prod_category = forms.MultipleChoiceField(label='Item Category',widget=forms.Mu(), choices=CATEGORY_CHOICES ,required=True)
     #content = forms.CharField(label="", widget=forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Talk Your Own', 'rows': '4', 'cols': '30'}))

@@ -18,7 +18,8 @@ class ShopManager(models.Manager):
         if query is not None:
             or_lookup = ( Q(prod_name__icontains = query)|
                          Q(prod_details__icontains=query)|
-                         Q(prod_location__icontains=query)
+                         Q(prod_location__icontains=query)|
+                         Q(prod_category__icontains=query)
                         ) 
             
             qs = qs.filter(or_lookup).distinct() # distinct() is often necessary with Q lookups
@@ -48,7 +49,8 @@ class Product(models.Model):
     date_posted = models.DateTimeField(default=timezone.now)
     phone_number = models.CharField(max_length=15, blank=True)
     # saved = models.ManyToManyField(User, related_name = 'saved_product', blank=True)
-    cart = models.ManyToManyField(User, related_name = 'liked_product', blank=True)
+    likes = models.ManyToManyField(User, related_name='prod_likes', blank=True)
+    saved = models.ManyToManyField(User, related_name = 'liked_product', blank=True)
     hit_count_generic = GenericRelation(
         HitCount, object_id_field='object_pk',
         related_query_name='hit_count_generic_relation')
@@ -57,6 +59,24 @@ class Product(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.prod_name, str(self.user.username))
+
+    def total_likes(self):
+        return self.likes.count()
+
+    def get_absolute_url(self):
+        return reverse('ad-detail', kwargs={'pk': self.pk})
+
+    def get_like_url(self):
+        return reverse("ad-like-toggle", kwargs={'pk': self.pk})
+
+    def get_api_like_url(self):
+        return reverse("ad-like-api-toggle",kwargs={'pk': self.pk})
+    
+    def get_api_save_url(self):
+        return reverse("ad-save-api-toggle", kwargs={'pk': self.pk})
+    
+    def get_save_url(self):
+        return reverse("ad-save-toggle", kwargs={'pk': self.pk})
 
 
 class ProductImage(models.Model):

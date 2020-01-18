@@ -26,7 +26,12 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'blog/favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'blog/favicon/favicon-16x16.png' %}">
     <link rel="manifest" href="{% static 'blog/favicon/site.webmanifest' %}">
-
+    <style>
+      .product_view{max-width: 650px; width: fit-content;} 
+      .modal-dialog{max-width: 650px; width: fit-content;}
+      .pre-cost{text-decoration: line-through; color: #a5a5a5;}
+      .space-ten{padding: 10px 0;}
+    </style>
     {%if request.user.is_authenticated%}
     <script src="{% static 'notifications/notify.js' %}" type="text/javascript"></script>
     {% register_notify_callbacks callbacks='fill_notification_list,fill_notification_badge' %}
@@ -38,14 +43,40 @@
 
     <script>
     $(document).ready(function(){
-      function updateText(btn, newCount, verb) {
-    btn.html(verb +" " + newCount)
+    function updateText(btn, newCount, verb) {
+      btn.html(verb +" " + newCount)
     }
 
     function updateBookmark(btn, verb) {
      btn.html(verb)
     }
-    
+    $(".ad-like-btn").click(function(e){
+      e.preventDefault()
+      var this_ = $(this)
+      var likeUrl = this_.attr("data-href")
+      var likeCount = parseInt(this_.attr("data-likes"))
+      var addLike = likeCount + 1
+      var removeLike = likeCount - 1 
+      $.ajax({
+        url: likeUrl,
+        method: "GET",
+        data: {},
+        success: function(data){
+          var newLikes;
+          if (data.is_liked){ 
+          newLikes = likeCount + 1 
+          updateText(this_, data.like_count, '<i class="fas fa-heart fa-lg"></i>')
+          } else { 
+          newLikes = likeCount - 1 
+          updateText(this_, data.like_count, "<i class='far fa-heart fa-lg'></i>")
+          }
+        }, error: function(error){
+          console.log("error")
+          console.log(error)
+        }
+      })
+    })    
+
     $(".like-btn").click(function(e){
       e.preventDefault()
       var this_ = $(this)
@@ -58,7 +89,6 @@
         method: "GET",
         data: {},
         success: function(data){
-          console.log(data)
           var newLikes;
           if (data.liked){ 
           newLikes = likeCount + 1 
@@ -86,7 +116,6 @@
         method: "GET",
         data: {},
         success: function(data){
-          console.log(data)
           var newLikes;
           if (data.liked){ 
           newLikes = likeCount + 1 
@@ -112,7 +141,28 @@
         method: "GET",
         data: {},
         success: function(data){
-          console.log(data)
+          var newLikes;
+          if (data.is_saved){ 
+          updateBookmark(this_, '<i class="fas fa-bookmark fa-lg ml-3 mt-2""></i>')
+          } else {
+          updateBookmark(this_, "<i class='far fa-bookmark fa-lg ml-3 mt-2'></i>")
+          }
+        }, error: function(error){
+          console.log("error")
+          console.log(error)
+        }
+      })
+    })
+
+    $(".ad-save-btn").click(function(e){
+      e.preventDefault()
+      var this_ = $(this)
+      var likeUrl = this_.attr("data-href")
+      $.ajax({
+        url: likeUrl,
+        method: "GET",
+        data: {},
+        success: function(data){
           var newLikes;
           if (data.is_saved){ 
           updateBookmark(this_, '<i class="fas fa-bookmark fa-lg ml-3 mt-2""></i>')
@@ -156,7 +206,6 @@
         method: "GET",
         data: {},
         success: function(data){
-          console.log(data)
           var newLikes;
           if (data.is_follow){ 
           updateFollow(this_, 'Unfollow', "follow-btn btn btn-outline-secondary btn-block")
@@ -260,6 +309,30 @@
             <!-- Navbar Right Side -->
             <div class="navbar-nav">
               {% if request.user.is_authenticated %}
+              <!--Shop-->
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Shop
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="{% url 'post-ad'%}">Post Ad</a>
+                  <a class="dropdown-item" href="{% url 'my-ads' %}">My Ads</a>
+                  <a class="dropdown-item" href="{% url 'saved-ad' %}">Saved Ads</a>
+                  <a class="dropdown-item" href="{% url 'all-ads' %}">All Ads</a>
+                  <div class="dropdown-divider"></div> 
+                  <a class="dropdown-item drop down-toggle" data-toggle="dropdown" href="#">Category</a>
+                      <div class="dropdown-menu" style='overflow-x: hidden; height: auto; max-height:100px;'>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'Accommodation' %}">Accommodation</a>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'Sound Devices' %}">Sound Devices</a>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'Cell' %}">Cell/Mobile/Wireless Phones</a>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'Books' %}">Books</a>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'Computers' %}">Computers</a>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'TVs' %}">TVs</a>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'Cosmetics' %}">Cosmetics</a>
+                        <a class="dropdown-item" href="{% url 'ad-category' 'Miscellaneous' %}">Miscellaneous</a>
+                      </div>
+                </div>
+              </li>
               <!-- Navbar Dropdown-->
               <li class="nav-item dropdown">
                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -268,27 +341,15 @@
                 <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                   <a class="dropdown-item" href="{% url 'post-create'%}">New Post</a>
                   <a class="dropdown-item" href="{% url 'user-posts' request.user.username %}">My Posts</a>
+                  <a class="dropdown-item" href="{% url 'saved'%}">Saved Post</a>
                   <a class="dropdown-item" href="{% url 'profile' %}">Profile</a>
                   <div class="dropdown-divider"></div>
                   {% comment %} <a class="dropdown-item" href="#">Something else here</a> {% endcomment %}
                 </div>
               </li>
-
               
 
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Shop
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{% url 'post-ad'%}">Post Ad</a>
-                  <a class="dropdown-item" href="#">My Ads</a>
-                  <a class="dropdown-item" href="{% url 'all-ads' %}">All Ads</a>
-                  <div class="dropdown-divider"></div>
-                  {% comment %} 
-                  <a class="dropdown-item" href="#">Something else here</a> {% endcomment %}
-                </div>
-              </li>
+
                 {% comment %} <a class="nav-item nav-link" href="{% url 'post-create' %}">New Post</a>
                 <a class="nav-item nav-link" href="{% url 'profile' %}">Profile</a> {% endcomment %}
 
@@ -304,25 +365,24 @@
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                     <a class="dropdown-item" href="{% url 'post-ad'%}">Post Ad</a>
-                    <a class="dropdown-item" href="#">My Ads</a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Something else here</a>
+                    <a class="dropdown-item" href="{% url 'my-ads' %}">My Ads</a>
+                    <a class="dropdown-item" href="{% url 'saved-ad' %}">Saved Ads</a>
+                    <a class="dropdown-item" href="{% url 'all-ads' %}">All Ads</a>
+                    <div class="dropdown-divider"></div> 
+                    <a class="dropdown-item drop down-toggle" data-toggle="dropdown" href="#">Category</a>
+                        <div class="dropdown-menu" style='overflow-x: hidden; height: auto; max-height:100px;'>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'Accommodation' %}">Accommodation</a>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'Sound Devices' %}">Sound Devices</a>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'Cell' %}">Cell/Mobile/Wireless Phones</a>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'Books' %}">Books</a>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'Computers' %}">Computers</a>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'TVs' %}">TVs</a>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'Cosmetics' %}">Cosmetics</a>
+                          <a class="dropdown-item" href="{% url 'ad-category' 'Miscellaneous' %}">Miscellaneous</a>
+                        </div>
                   </div>
                 </li>
               {% endif %}
-
-              {% comment %} <!-- Navbar Dropdown-->
-              <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Shop
-                </a>
-                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                  <a class="dropdown-item" href="{% url 'post-ad'%}">Post Ad</a>
-                  <a class="dropdown-item" href="#">My Ads</a>
-                  <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" href="#">Something else here</a>
-                </div>
-              </li> {% endcomment %}
 
             </div>
           </div>
@@ -349,8 +409,7 @@
                 {% if request.user.is_authenticated %}
                 {% if request.user.profile.verified %}
                 <a href="{% url 'wallet' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Wallet</li></a> 
-                {%endif%}
-                <a href="{% url 'saved' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Saved</li></a>
+                {%endif%}                
                 {% endif %}  
                 <a href="{% url 'all_jobs' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Jobs</li></a>           
                 {% comment %} <a href="{% url 'trending' %}" style="text-decoration: none;"><li class="list-group-item list-group-item-light">Trending</li></a>  

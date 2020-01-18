@@ -119,6 +119,8 @@
           </div>
         </article>
 
+    
+    
     {% elif class == 'Share' %}
       <article class="media content-section">
         <div class="media-body">
@@ -412,6 +414,51 @@
         </div>
 
       </article>
+    {% elif class == 'Product' %}
+      <div class="card mb-4">
+        {% comment %} <img class="card-img-top img-fluid" src="http://placehold.it/900x400" alt=""> {% endcomment %}
+            {%for p in post.productimage_set.all %}
+              {% if forloop.first %}
+                <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fas fa-camera"></i> {{post.productimage_set.count}}</span>
+                <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
+                data-toggle="modal" data-target="#product_view{{ post.pk }}"
+                >
+              {%endif%}
+              {% include 'shop/modal.html'%}
+            {%endfor%}
+        <div class="card-body">
+            <h4 class="card-title">{{post.prod_name}}</h4>
+            <h6>{{post.prod_price}}</h6>
+            <p class="card-text">{{post.prod_details|truncatewords:'50'|urlize}}
+              {% ifnotequal post.prod_details|truncatewords:"50"|length post.prod_details|truncatewords:"51"|length %}
+              <a href="#" class="mt-0" data-toggle="modal" data-target="#product_view{{ post.pk }}">read more</a>
+              {% endifnotequal %}
+            </p>            <p class="mt-2">
+              <small class="text-muted" style="float: left;">
+
+                <!--Ad Like-->
+                {%if request.user.is_authenticated%}
+                {% if request.user in post.likes.all%}
+                <a class="ad-like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="fas fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {%else%}
+                <a class="ad-like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{post.get_api_like_url}}" data-likes="{{post.likes.count}}" href="{{ post.get_like_url }}">
+                <i class="far fa-heart fa-lg"> </i> {{post.likes.count}}</a>
+                {% endif %}          
+                {% if request.user in post.saved.all %}
+                <a class="ad-save-btn" href="{{post.get_save_url}}" data-href="{{post.get_api_save_url}}" data-toggle="tooltip" title="Remove from Wishlist" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
+                </a>
+                {% else %}
+                <a class="ad-save-btn" href="{{post.get_save_url}}" data-href="{{post.get_api_save_url}}" data-toggle="tooltip" title="Add To Wishlist" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
+                </a>
+                {% endif %}      
+                {%else%}
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like,save and share post</small></a>
+                {%endif%}
+            </small>
+          </p>
+        </div>
+      </div>
     {%endif%}
 
       {% endwith %}
