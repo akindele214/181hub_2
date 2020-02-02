@@ -132,11 +132,12 @@ class PostListView(ListView):
             return sorted(chain_qs, key=lambda x: x.date_posted, reverse=True)
 
         else:
-            date = timedelta(days=8)
+            date = timedelta(days=108)
             last_week = timezone.now() - date
+            final_ad = Product.objects.all().order_by('-date_posted')
             posts = Post.objects.all().exclude(date_posted__lt=last_week).order_by('?')
             jobs = JobOpening.objects.all().order_by('-date_posted')
-            chain_ = chain(posts, jobs)
+            chain_ = chain(posts, jobs, final_ad)
             return sorted(chain_, key= lambda x: x.date_posted, reverse= True)
 
 

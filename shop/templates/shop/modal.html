@@ -37,6 +37,9 @@
       <p class="card-text">Contact: {{post.phone_number}}</p>
      </div>
      <div class="modal-footer">
+        {% if post.user == request.user %}
+        <a class="btn btn-outline-secondary btn-sm" href="{% url 'delete-ad' post.pk %}">Delete</a>
+        {% endif %}
         <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal">Close</button>
       </div>
     </div>

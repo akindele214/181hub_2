@@ -6,9 +6,11 @@
       <div id="carouselExampleSlidesOnly" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
           <div class="carousel-item active">
+            <a href="https://wa.me/27638122518"><span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fab fa-whatsapp"></i> Contact Me</span></a>
             <img class="d-block w-100" src="/media/website_img/moon_ad.jpg" alt="First slide">
           </div>
           <div class="carousel-item">
+            <a href="https://www.instagram.com/nails_with_the_sauce/"><span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fab fa-whatsapp"></i> Contact Me</span></a>
             <img class="d-block w-100" src="/media/website_img/nails_ws.jpeg" alt="Second slide">
           </div>
           {% comment %} <div class="carousel-item">
@@ -39,9 +41,9 @@
             <h5 class="card-title">{{post.prod_name}}</h5>
             <h6>{{post.prod_price}}</h6>
             <p class="card-text">{{post.prod_details|truncatewords:'30'|urlize}}
-               {% ifnotequal post.prod_details|truncatewords:"30"|length post.prod_details|truncatewords:"31"|length %}
+  
               <a href="#" class="mt-0" data-toggle="modal" data-target="#product_view{{ post.pk }}">read more</a>
-              {% endifnotequal %}
+  
             </p>
             <p class="mt-2">
               <small class="text-muted" style="float: left;">
@@ -63,7 +65,7 @@
                 </a>
                 {% endif %}      
                 {%else%}
-                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like,save and share post</small></a>
+                <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like,save and share ad</small></a>
                 {%endif%}            
               </small>
           </p>

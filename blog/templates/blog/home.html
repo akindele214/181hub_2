@@ -430,10 +430,9 @@
             <h4 class="card-title">{{post.prod_name}}</h4>
             <h6>{{post.prod_price}}</h6>
             <p class="card-text">{{post.prod_details|truncatewords:'50'|urlize}}
-              {% ifnotequal post.prod_details|truncatewords:"50"|length post.prod_details|truncatewords:"51"|length %}
-              <a href="#" class="mt-0" data-toggle="modal" data-target="#product_view{{ post.pk }}">read more</a>
-              {% endifnotequal %}
-            </p>            <p class="mt-2">
+              <a href="#" class="mt-0" data-toggle="modal" data-target="#product_view{{ post.pk }}"> read more</a>
+            </p>            
+            <p class="mt-2">
               <small class="text-muted" style="float: left;">
 
                 <!--Ad Like-->
