@@ -83,9 +83,11 @@ class PostListView(ListView):
         final_ad = []
 
         if self.request.user.is_authenticated:
+            lekan = User.objects.get(id=1)
             user_id = self.request.user.id
             view_user_post = Post.objects.filter(user__exact=self.request.user)
             user_profile = User.objects.get(id=user_id).profile
+            lekan_post = Post.objects.filter(user__exact=lekan)
 
             date = timedelta(days=7)
             last_week = timezone.now() - date
@@ -125,11 +127,15 @@ class PostListView(ListView):
 
             logged_in_user_shared_post = Share.objects.filter(user__exact=self.request.user.id)
             logged_in_user_shared_job_post = ShareJob.objects.filter(user__exact=self.request.user.id)
+            
             # print(logged_in_user_shared_job_post)
             ads = Product.objects.all()
-            chain_qs = chain(posts, view_user_post, shared_post, logged_in_user_shared_post,
+            uniqueList = []
+            chain_qs = chain(lekan_post, posts, view_user_post, shared_post, logged_in_user_shared_post,
                              final_hash_post, logged_in_user_shared_job_post, shared_job, ads)
-            return sorted(chain_qs, key=lambda x: x.date_posted, reverse=True)
+            uni = list(set(chain_qs))
+
+            return sorted(uni, key=lambda x: x.date_posted, reverse=True)
 
         else:
             date = timedelta(days=108)
@@ -137,7 +143,10 @@ class PostListView(ListView):
             final_ad = Product.objects.all().order_by('-date_posted')
             posts = Post.objects.all().exclude(date_posted__lt=last_week).order_by('?')
             jobs = JobOpening.objects.all().order_by('-date_posted')
+            lekan = User.objects.get(id=1)
+            lekan_post = Post.objects.filter(user__exact=lekan)
             chain_ = chain(posts, jobs, final_ad)
+    
             return sorted(chain_, key= lambda x: x.date_posted, reverse= True)
 
 
@@ -184,7 +193,9 @@ class SearchView(ListView):
             blog_results = Post.objects.search(query)
             profile_results = Profile.objects.search(query)
             job_results = JobOpening.objects.search(query)
-            queryset_chain = chain(profile_results, blog_results, job_results)
+            shop_results = Product.objects.search(query)
+            queryset_chain = chain(profile_results,
+                            blog_results, job_results, shop_results)
 
             qs = sorted(queryset_chain, key=lambda instance: instance.pk,
                         reverse=True)
@@ -360,7 +371,7 @@ class PostDetailView(PostMixinDetailView, HitCountDetailView):
             'is_liked': is_liked,
             'total_likes': post.total_likes(),
             'comments': comments,
-            # 'comment_form': comment_form,
+            'comment_form': comment_form,
             'is_saved': is_saved,
 
         }
@@ -405,7 +416,7 @@ class PostDetailView(PostMixinDetailView, HitCountDetailView):
             'is_liked': is_liked,
             'total_likes': post.total_likes(),
             'comments': comments,
-            # 'comment_form': comment_form,
+            'comment_form': comment_form,
             'is_saved': is_saved,
         }
         if request.is_ajax():

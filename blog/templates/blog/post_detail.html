@@ -149,7 +149,7 @@ jQuery(document).ready(function($) {
         <br><br>
         <hr>
         
-        {% comment %} {% if object.restrict_comment %}
+       {% if object.restrict_comment %}
         <div class="main-comment-section mb-5">
           <input type="submit" value="Comments Has Been Restricted By {{ object.user }}" class="btn btn-outline-info" disabled>
         </div>
@@ -157,7 +157,7 @@ jQuery(document).ready(function($) {
         <div class="main-comment-section mb-5">
             {% include 'blog/comments.html' %}
           </div>
-        {% endif %} {% endcomment %}
+        {% endif %}
 
 {% endblock content %}
 

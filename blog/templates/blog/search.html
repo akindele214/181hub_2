@@ -20,7 +20,98 @@
     <p class="mb-3" ><a href="{% url 'following_list' object.user.username %}" style="text-decoration: none; color: #428bca;">Following: {{object.follower.count}}</a></p>
     </div>
     </article>
-           
+    {% elif klass == 'Product' %}
+    <div class="card mb-4">
+            {% comment %} <img class="card-img-top img-fluid" src="http://placehold.it/900x400" alt=""> {% endcomment %}
+                {%for p in object.productimage_set.all %}
+                  {% if forloop.first %}
+                    <span class="badge badge-light"  style="position: absolute; top: 8px; right: 16px;"><i class="fas fa-camera"></i> {{object.productimage_set.count}}</span>
+                    <img src="{{p.image.url}}" style="object-fit:cover;width: 100%; max-height:300px;" class="rounded img-fluid"
+                    data-toggle="modal" data-target="#product_view{{ object.pk }}"
+                    >
+                  {%endif%}
+                  <!-- Modal Begins -->
+                  <div class="modal fade" id="product_view{{ object.pk }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLongTitle">{{ object.prod_name }}</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hdden="true">&times;</span>
+                          </button>
+                        </div>
+                        <div class="modal-body">
+                        <div class="container col-sm-12 text-center">
+                         <div id="carouselExampleControls{{ object.pk }}" class="row justify-content-md-center carousel slide mb-4" data-ride="carousel" data-interval="false">
+                        <div class="carousel-inner">
+                          {% for p in object.productimage_set.all %}
+                          <div {% if forloop.first %} class="carousel-item active" {% else %} class="carousel-item" {% endif %}>
+                              <img src="{{p.image.url}}" class="img-fluid rounded" alt="...">
+                          </div>
+                          
+                          {%endfor%}
+                        </div>
+                        {% if post.productimage_set.count > 1 %}
+                          <a class="carousel-control-prev" href="#carouselExampleControls{{ object.pk }}" role="button" data-slide="prev">
+                          <span class="carousel-control-prev-icon" aria-hidden="true" style="color: #5f788a;"></span>
+                          <span class="sr-only" style="color: #5f788a;">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carouselExampleControls{{ object.pk }}" role="button" data-slide="next">
+                          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                          <span class="sr-only">Next</span>
+                        </a>
+                        {%endif%}
+                  
+                        </div>
+                        </div>
+                        <hr>
+                        <p class="card-text"><b>Ad Description:</b> {{object.prod_details}}</p>
+                        <p class="card-text">Price: {{object.prod_price}}</p>
+                        <p class="card-text">Contact: {{object.phone_number}}</p>
+                       </div>
+                       <div class="modal-footer">
+                          {% if object.user == request.user %}
+                          <a class="btn btn-outline-secondary btn-sm" href="{% url 'delete-ad' object.pk %}">Delete</a>
+                          {% endif %}
+                          <button type="button" class="btn btn-outline-danger btn-sm" data-dismiss="modal">Close</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Modal Ends -->
+                  {%endfor%}
+            <div class="card-body">
+                <h5 class="card-title">{{object.prod_name}}</h5>
+                <h6>{{object.prod_price}}</h6>
+                <p class="card-text">{{object.prod_details|truncatewords:'30'|urlize}}
+                  <a href="#" class="mt-0" data-toggle="modal" data-target="#product_view{{ object.pk }}">read more</a>
+                </p>
+                <p class="mt-2">
+                  <small class="text-muted" style="float: left;">
+    
+                    <!--Ad Like-->
+                    {%if request.user.is_authenticated%}
+                    {% if request.user in object.likes.all%}
+                    <a class="ad-like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+                    <i class="fas fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+                    {%else%}
+                    <a class="ad-like-btn" style="text-decoration: none; color: #5f788a;" data-href="{{object.get_api_like_url}}" data-likes="{{object.likes.count}}" href="{{ object.get_like_url }}">
+                    <i class="far fa-heart fa-lg"> </i> {{object.likes.count}}</a>
+                    {% endif %}          
+                    {% if request.user in object.saved.all %}
+                    <a class="ad-save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" data-toggle="tooltip" title="Remove from Wishlist" style="text-decoration: none; color: #5f788a;"><i class="fas fa-bookmark fa-lg ml-3 mt-2" id="save"></i>
+                    </a>
+                    {% else %}
+                    <a class="ad-save-btn" href="{{object.get_save_url}}" data-href="{{object.get_api_save_url}}" data-toggle="tooltip" title="Add To Wishlist" style="text-decoration: none; color: #5f788a;"><i class="far fa-bookmark fa-lg ml-3 mt-2" id="save" ></i>
+                    </a>
+                    {% endif %}      
+                    {%else%}
+                    <a href="{%url 'login'%}"><small class="text-muted" style="float: right;">log in to like,save and share ad</small></a>
+                    {%endif%}            
+                  </small>
+              </p>
+            </div>
+          </div>
       {% elif klass == 'JobOpening'%}
     <article class="media content-section"> 
           <div class="media-body">
