@@ -215,8 +215,6 @@ EMAIL_USE_TLS = True
 
 EMAIL_HOST_USER = '181hub@gmail.com'
 
-EMAIL_HOST_PASSWORD = 'akindele/97'
-
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '12077509443-o1bjp988p7dnb5hf6k8sebfoj168gbas.apps.googleusercontent.com'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = 'uWyMaJDFck3qNtXnifTMl9D4'
