@@ -36,7 +36,7 @@ django-notify-x==0.1.9
 django-pdb==0.6.2
 django-profanity-filter==0.2.1
 django-redis==4.10.0
-django-registration==3.0
+django-registration==3.1.2
 django-rest-auth==0.9.5
 django-taggit==1.1.0
 django-user-agents==0.4.0
